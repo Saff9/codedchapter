@@ -1,125 +1,192 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useGetFeaturedPosts, useGetAllTags } from "@workspace/api-client-react";
-import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/post-card";
-import { ArrowRight, Code2, TerminalSquare, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Flame, Star, Zap } from "lucide-react";
+
+const tagColors = ["tag-amber", "tag-violet", "tag-emerald", "tag-blue", "tag-rose", "tag-cyan"];
 
 export default function Home() {
-  const { data: featuredPosts, isLoading: isLoadingFeatured } = useGetFeaturedPosts();
+  const { data: featuredPosts, isLoading } = useGetFeaturedPosts();
   const { data: tags } = useGetAllTags();
 
   return (
-    <div className="flex flex-col w-full relative">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden border-b border-border/30">
-        {/* Animated Background Grids */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_hsl(var(--primary)/0.08)_1px,_transparent_1px)] bg-[size:24px_24px] opacity-40 mix-blend-screen" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
+    <div className="flex flex-col w-full">
 
-        <div className="container relative z-10 mx-auto px-4 md:px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-            
-            <div className="flex-1 space-y-8 max-w-3xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <section className="relative pt-16 pb-20 md:pt-20 md:pb-28 overflow-hidden">
+        {/* Amber glow top-left */}
+        <div className="pointer-events-none absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px]" />
+        {/* Violet glow bottom-right */}
+        <div className="pointer-events-none absolute -bottom-32 right-0 w-[500px] h-[500px] rounded-full bg-secondary/10 blur-[100px]" />
+
+        <div className="container relative z-10 mx-auto px-6 lg:px-8">
+
+          {/* Eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-6"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Learning in public · Chapter 1
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left – headline */}
+            <div className="space-y-6">
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-sm font-mono shadow-[0_0_15px_rgba(14,194,172,0.1)]"
+                transition={{ duration: 0.5, delay: 0.08 }}
+                className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.12] tracking-tight"
+                style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
-                <TerminalSquare className="w-4 h-4" />
-                <span>Hello, World!<span className="inline-block w-2 h-4 bg-secondary ml-1 align-middle animate-blink"></span></span>
-              </motion.div>
-              
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1]"
-              >
-                Documenting the journey from <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500 drop-shadow-[0_0_20px_rgba(91,91,214,0.3)]">confusion</span> to <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-teal-400 drop-shadow-[0_0_20px_rgba(14,194,172,0.3)]">clarity.</span>
+                One coder.
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-amber-400 to-orange-500">
+                  Every mistake.
+                </span>
+                <br />
+                Written down.
               </motion.h1>
-              
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg md:text-xl text-muted-foreground/90 leading-relaxed max-w-2xl font-light"
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-lg"
               >
-                A digital notebook where I untangle concepts, share mistakes, and celebrate the small victories of learning to code.
+                Coded Chapter is my personal log as I go from zero to software engineer — one concept at a time, in plain English, with all the confusion left in.
               </motion.p>
-              
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-4 pt-4"
+                transition={{ duration: 0.5, delay: 0.22 }}
+                className="flex items-center gap-4 pt-2"
               >
                 <Link href="/blog">
-                  <Button size="lg" className="h-14 px-8 gap-3 text-base rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(91,91,214,0.4)] hover:shadow-[0_0_30px_rgba(91,91,214,0.6)] transition-all duration-300">
-                    <BookOpen className="w-5 h-5" />
-                    Read the Chapters
-                  </Button>
+                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/25">
+                    <BookOpen className="w-4 h-4" />
+                    Start Reading
+                  </button>
                 </Link>
+                <Link href="/blog">
+                  <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                    Browse all posts <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </Link>
+              </motion.div>
+
+              {/* Mini stats */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="flex items-center gap-6 pt-2 border-t border-border/40"
+              >
+                {[
+                  { icon: <BookOpen className="w-3.5 h-3.5" />, label: `${featuredPosts?.length ?? "—"} chapters` },
+                  { icon: <Flame className="w-3.5 h-3.5" />, label: `${tags?.length ?? "—"} topics` },
+                  { icon: <Star className="w-3.5 h-3.5" />, label: "100% real confusion" },
+                ].map(({ icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="text-primary">{icon}</span>
+                    {label}
+                  </div>
+                ))}
               </motion.div>
             </div>
 
-            {/* Decorative Code Block */}
+            {/* Right – decorative code card */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, rotate: -2 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="hidden lg:block w-[400px] bg-[#1a1e36] rounded-2xl border border-white/10 shadow-2xl shadow-primary/20 overflow-hidden"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="hidden lg:block"
             >
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#141729]">
-                <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                <span className="ml-4 text-xs font-mono text-muted-foreground">journey.ts</span>
-              </div>
-              <div className="p-6 font-mono text-sm leading-loose">
-                <span className="text-purple-400">const</span> <span className="text-blue-300">chapter</span> <span className="text-white">=</span> <span className="text-purple-400">await</span> <span className="text-teal-300">learn</span>(<span className="text-yellow-300">"coding"</span>);<br/>
-                <span className="text-purple-400">if</span> (chapter.<span className="text-blue-300">hasBugs</span>) {'{'}<br/>
-                &nbsp;&nbsp;<span className="text-teal-300">debug</span>();<br/>
-                &nbsp;&nbsp;<span className="text-teal-300">drinkCoffee</span>();<br/>
-                {'}'} <span className="text-purple-400">else</span> {'{'}<br/>
-                &nbsp;&nbsp;<span className="text-teal-300">publish</span>(chapter);<br/>
-                {'}'}
+              <div className="relative">
+                {/* Glow behind the card */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 blur-2xl rounded-3xl scale-95" />
+                {/* Code card */}
+                <div className="relative bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
+                  {/* Window bar */}
+                  <div className="flex items-center gap-1.5 px-4 py-3 border-b border-border bg-muted/40">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                    <span className="ml-3 text-xs font-mono text-muted-foreground">journey.ts</span>
+                  </div>
+                  <div className="p-6 font-mono text-sm leading-7">
+                    <div><span className="text-violet-400">const</span> <span className="text-sky-300">me</span> <span className="text-foreground/60">=</span> <span className="text-foreground/80">{'{'}</span></div>
+                    <div className="pl-6"><span className="text-amber-400">name</span><span className="text-foreground/60">:</span> <span className="text-emerald-400">"New Developer"</span><span className="text-foreground/60">,</span></div>
+                    <div className="pl-6"><span className="text-amber-400">goal</span><span className="text-foreground/60">:</span> <span className="text-emerald-400">"Software Engineer"</span><span className="text-foreground/60">,</span></div>
+                    <div className="pl-6"><span className="text-amber-400">progress</span><span className="text-foreground/60">:</span> <span className="text-sky-300">learning</span><span className="text-foreground/60">,</span></div>
+                    <div><span className="text-foreground/80">{'}'}</span><span className="text-foreground/40">;</span></div>
+                    <div className="mt-3"><span className="text-foreground/40">// Every chapter gets me closer</span></div>
+                    <div><span className="text-violet-400">while</span> (<span className="text-sky-300">me</span>.<span className="text-amber-400">progress</span> <span className="text-foreground/60">!==</span> <span className="text-emerald-400">"done"</span>) <span className="text-foreground/80">{'{'}</span></div>
+                    <div className="pl-6"><span className="text-sky-300">me</span>.<span className="text-amber-400">write</span>(<span className="text-emerald-400">"a new chapter"</span>)<span className="text-foreground/40">;</span></div>
+                    <div><span className="text-foreground/80">{'}'}</span></div>
+                  </div>
+                </div>
+
+                {/* Floating badges */}
+                <motion.div
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="absolute -top-3 -right-4 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg shadow-primary/30"
+                >
+                  Chapter 5 is live
+                </motion.div>
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 0.5 }}
+                  className="absolute -bottom-3 -left-4 bg-secondary/20 border border-secondary/30 text-secondary text-xs font-mono px-3 py-1.5 rounded-full"
+                >
+                  + 3 comments
+                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Featured Posts */}
-      <section className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
-        <div className="container relative z-10 mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-              <Code2 className="w-8 h-8 text-primary drop-shadow-[0_0_10px_rgba(91,91,214,0.5)]" />
-              Featured Chapters
-            </h2>
-            <Link href="/blog" className="text-sm font-semibold text-primary hover:text-secondary hover:underline flex items-center gap-1 transition-colors">
-              View all <ArrowRight className="w-4 h-4" />
+      {/* ── LATEST CHAPTERS ──────────────────────────────────────── */}
+      <section className="py-16 border-t border-border/40">
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <div className="flex items-center gap-2 text-primary text-xs font-mono mb-1">
+                <Zap className="w-3.5 h-3.5" /> Latest Chapters
+              </div>
+              <h2 className="text-2xl font-bold" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+                What I've been learning
+              </h2>
+            </div>
+            <Link href="/blog">
+              <span className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors cursor-pointer font-medium">
+                All posts <ArrowRight className="w-3.5 h-3.5" />
+              </span>
             </Link>
           </div>
-          
-          {isLoadingFeatured ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-[420px] bg-card/50 rounded-2xl animate-pulse" />
+                <div key={i} className="h-56 bg-card rounded-xl animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {featuredPosts?.map((post, i) => (
                 <motion.div
                   key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
                 >
                   <PostCard post={post} />
                 </motion.div>
@@ -129,36 +196,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About/Tags Section */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="container relative z-10 mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <h2 className="text-4xl font-extrabold tracking-tight">The Story So Far</h2>
-              <p className="text-muted-foreground/90 text-lg md:text-xl leading-relaxed font-light">
-                I started coding because I wanted to build things. I quickly realized that building things means breaking things first. This blog is my attempt to map the territory as I explore it — writing down the solutions I spend hours finding so my future self (and maybe you) won't have to.
+      {/* ── ABOUT + TAGS ─────────────────────────────────────────── */}
+      <section className="py-16 border-t border-border/40">
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="grid lg:grid-cols-5 gap-12">
+
+            {/* About – 3 cols */}
+            <div className="lg:col-span-3 space-y-5">
+              <div className="text-xs font-mono text-primary mb-1">// about this blog</div>
+              <h2 className="text-3xl font-bold leading-tight" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+                Learning to code,<br />one honest post at a time.
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                I started Coded Chapter because when I was learning, most tutorials assumed I already knew things I didn't. Every post here is written from the perspective of someone who just figured something out — with all the confusion, the failed attempts, and the "aha" moments included.
               </p>
+              <p className="text-muted-foreground leading-relaxed">
+                If you're also learning, I hope this feels like reading notes from a slightly-ahead classmate, not a lecture from an expert.
+              </p>
+              <Link href="/blog">
+                <button className="mt-2 inline-flex items-center gap-2 text-sm text-primary font-medium hover:gap-3 transition-all">
+                  Read the full journey <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
             </div>
-            
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-              <div className="relative bg-card/80 backdrop-blur-xl border border-white/5 p-10 rounded-2xl">
-                <h3 className="text-2xl font-bold mb-8 font-mono flex items-center gap-3">
-                  <TerminalSquare className="w-6 h-6 text-secondary" />
-                  Topics.explored
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {tags?.map(tag => (
-                    <Link key={tag} href={`/blog?tag=${tag}`}>
-                      <span className="px-4 py-2 rounded-lg bg-background text-foreground/80 hover:text-white transition-all text-sm font-mono cursor-pointer border border-white/10 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(91,91,214,0.3)] block">
-                        #{tag}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+
+            {/* Tags – 2 cols */}
+            <div className="lg:col-span-2">
+              <div className="text-xs font-mono text-muted-foreground mb-4">topics.explored()</div>
+              <div className="flex flex-wrap gap-2">
+                {tags?.map((tag, i) => (
+                  <Link key={tag} href={`/blog?tag=${tag}`}>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-mono cursor-pointer hover:scale-105 transition-transform ${tagColors[i % tagColors.length]}`}>
+                      #{tag}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* CTA card */}
+              <div className="mt-8 p-5 rounded-xl border border-primary/20 bg-primary/5">
+                <div className="text-sm font-semibold mb-1" style={{ fontFamily: "Space Grotesk, sans-serif" }}>Got something to say?</div>
+                <div className="text-xs text-muted-foreground mb-3">Sign up to leave comments and join the conversation.</div>
+                <Link href="/sign-up">
+                  <button className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+                    Create an account — it's free
+                  </button>
+                </Link>
               </div>
             </div>
+
           </div>
         </div>
       </section>

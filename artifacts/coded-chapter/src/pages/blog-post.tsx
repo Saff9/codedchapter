@@ -5,57 +5,55 @@ import { format } from "date-fns";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, ArrowLeft, Send, Trash2, Calendar } from "lucide-react";
+import { Clock, ArrowLeft, Send, Trash2, Calendar, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+
+const TAG_COLORS: Record<string, string> = {
+  python: "text-sky-400 bg-sky-400/10 border-sky-400/20",
+  javascript: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
+  html: "text-orange-400 bg-orange-400/10 border-orange-400/20",
+  css: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  beginners: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  journal: "text-violet-400 bg-violet-400/10 border-violet-400/20",
+  concepts: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+  functions: "text-rose-400 bg-rose-400/10 border-rose-400/20",
+  web: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
+};
+const FALLBACK = ["text-amber-400 bg-amber-400/10 border-amber-400/20", "text-violet-400 bg-violet-400/10 border-violet-400/20"];
+function tagColor(tag: string, i: number) { return TAG_COLORS[tag] ?? FALLBACK[i % FALLBACK.length]; }
 
 export default function BlogPost() {
   const { id } = useParams<{ id: string }>();
   const postId = parseInt(id || "0", 10);
-  
-  const { data: post, isLoading } = useGetPost(postId, { 
-    query: { enabled: !!postId } 
-  });
-  
-  const { data: comments } = useListComments(postId, {
-    query: { enabled: !!postId }
-  });
+
+  const { data: post, isLoading } = useGetPost(postId, { query: { enabled: !!postId } });
+  const { data: comments } = useListComments(postId, { query: { enabled: !!postId } });
 
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   if (isLoading) {
     return (
-      <div className="container max-w-3xl mx-auto px-4 py-24 text-center">
-        <div className="animate-pulse space-y-8">
-          <div className="h-8 w-32 bg-muted rounded-full mx-auto" />
-          <div className="h-16 w-3/4 bg-muted rounded-xl mx-auto" />
-          <div className="h-64 w-full bg-muted rounded-2xl" />
-          <div className="space-y-4 pt-8">
-            <div className="h-4 w-full bg-muted rounded" />
-            <div className="h-4 w-full bg-muted rounded" />
-            <div className="h-4 w-2/3 bg-muted rounded" />
-          </div>
-        </div>
+      <div className="container max-w-2xl mx-auto px-6 py-16 animate-pulse space-y-6">
+        <div className="h-4 w-24 bg-muted rounded" />
+        <div className="h-10 w-3/4 bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-2/3 bg-muted rounded" />
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="container max-w-3xl mx-auto px-4 py-32 text-center space-y-6">
-        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-8">
-          <span className="text-3xl font-mono text-muted-foreground">404</span>
-        </div>
-        <h1 className="text-3xl font-extrabold font-display">Post not found</h1>
-        <p className="text-muted-foreground max-w-md mx-auto">The chapter you're looking for doesn't exist or has been moved.</p>
+      <div className="container max-w-2xl mx-auto px-6 py-24 text-center space-y-4">
+        <div className="text-5xl font-mono text-muted-foreground">404</div>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "Space Grotesk, sans-serif" }}>Chapter not found</h1>
         <Link href="/blog">
-          <Button variant="outline" className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Back to blog</Button>
+          <Button variant="outline" size="sm" className="mt-4">
+            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Back to blog
+          </Button>
         </Link>
       </div>
     );
@@ -63,182 +61,188 @@ export default function BlogPost() {
 
   return (
     <>
+      {/* Reading progress bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary origin-left z-50 shadow-[0_0_10px_rgba(91,91,214,0.5)]"
+        className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-amber-400 to-orange-500 origin-left z-50"
         style={{ scaleX }}
       />
-      
-      <article className="container max-w-3xl mx-auto px-4 py-16 md:py-24">
-        <Link href="/blog" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary mb-12 transition-colors group">
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to chapters
+
+      <article className="container max-w-2xl mx-auto px-6 py-12 md:py-16">
+
+        {/* Back link */}
+        <Link href="/blog">
+          <span className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer mb-8 group">
+            <ArrowLeft className="w-3.5 h-3.5 mr-1.5 group-hover:-translate-x-0.5 transition-transform" />
+            All chapters
+          </span>
         </Link>
 
-        <header className="mb-16 space-y-8">
-          <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              {format(new Date(post.createdAt), 'MMMM d, yyyy')}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-secondary" />
-              {post.readingTimeMinutes} min read
-            </span>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] font-display">
-            {post.title}
-          </h1>
-
-          <div className="flex flex-wrap gap-3">
-            {post.tags.map(tag => (
+        {/* Post header */}
+        <header className="mb-10 space-y-5">
+          <div className="flex flex-wrap gap-1.5">
+            {post.tags.map((tag, i) => (
               <Link key={tag} href={`/blog?tag=${tag}`}>
-                <span className="px-4 py-1.5 bg-primary/10 border border-primary/20 text-primary rounded-full text-xs font-mono font-medium hover:bg-primary/20 hover:shadow-[0_0_10px_rgba(91,91,214,0.2)] transition-all cursor-pointer block">
+                <span className={`inline-flex px-2 py-0.5 rounded-md border text-[10px] font-mono font-medium cursor-pointer hover:opacity-80 transition-opacity ${tagColor(tag, i)}`}>
                   #{tag}
                 </span>
               </Link>
             ))}
           </div>
+
+          <h1
+            className="text-3xl md:text-4xl font-bold leading-tight tracking-tight"
+            style={{ fontFamily: "Space Grotesk, sans-serif" }}
+          >
+            {post.title}
+          </h1>
+
+          <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1 border-t border-border/40">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {format(new Date(post.createdAt), "MMMM d, yyyy")}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              {post.readingTimeMinutes} min read
+            </span>
+            <span className="flex items-center gap-1.5">
+              <MessageCircle className="w-3.5 h-3.5" />
+              {comments?.length ?? 0} comments
+            </span>
+          </div>
         </header>
 
+        {/* Cover image */}
         {post.coverImage && (
-          <div className="relative aspect-[21/9] w-full rounded-3xl overflow-hidden mb-16 border border-border shadow-2xl shadow-black/50">
-            <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
+          <div className="relative rounded-xl overflow-hidden mb-10 border border-border">
+            <img src={post.coverImage} alt={post.title} className="w-full object-cover" />
           </div>
         )}
 
-        <div 
-          className="prose prose-invert prose-lg max-w-none 
-          prose-headings:font-display prose-headings:font-bold prose-h2:text-3xl prose-h3:text-2xl
-          prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:font-light
-          prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-          prose-pre:bg-[#141729] prose-pre:border prose-pre:border-border prose-pre:rounded-xl prose-pre:shadow-xl
-          prose-code:text-secondary prose-code:bg-secondary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-          prose-strong:text-foreground prose-strong:font-semibold
-          prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:text-muted-foreground prose-blockquote:font-style-normal
-          prose-img:rounded-xl prose-img:border prose-img:border-border"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+        {/* Content */}
+        <div
+          className="prose prose-sm md:prose-base max-w-none
+            prose-invert
+            prose-headings:font-bold prose-headings:tracking-tight
+            prose-p:text-foreground/85 prose-p:leading-[1.8]
+            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+            prose-pre:bg-card prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:text-sm
+            prose-code:text-amber-400 prose-code:bg-amber-400/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none
+            prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic
+            prose-strong:text-foreground"
+          dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, "<br/>") }}
         />
-        
-        <hr className="my-20 border-border" />
-        
+
+        <hr className="my-14 border-border/40" />
+
         <CommentSection postId={postId} comments={comments || []} />
       </article>
     </>
   );
 }
 
-function CommentSection({ postId, comments }: { postId: number, comments: any[] }) {
+function CommentSection({ postId, comments }: { postId: number; comments: any[] }) {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
-  
+
   const createComment = useCreateComment({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [`/api/posts/${postId}/comments`] });
         setContent("");
-      }
-    }
+      },
+    },
   });
 
   const deleteComment = useDeleteComment({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [`/api/posts/${postId}/comments`] });
-      }
-    }
+      },
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-    createComment.mutate({ postId, data: { content } });
-  };
-
   return (
-    <section className="space-y-12">
-      <div className="flex items-center justify-between">
-        <h3 className="text-3xl font-extrabold tracking-tight font-display flex items-center gap-3">
-          Discussion 
-          <span className="inline-flex items-center justify-center bg-primary/20 text-primary text-sm rounded-full w-8 h-8 font-mono">
-            {comments.length}
-          </span>
-        </h3>
-      </div>
+    <section className="space-y-8">
+      <h3 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+        <MessageCircle className="w-5 h-5 text-primary" />
+        Discussion
+        <span className="ml-1 text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+          {comments.length}
+        </span>
+      </h3>
 
+      {/* Sign-in prompt */}
       <Show when="signed-out">
-        <div className="bg-card border border-border rounded-2xl p-8 text-center space-y-6 relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10">
-            <h4 className="text-xl font-bold mb-2">Join the conversation</h4>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">Sign in to share your thoughts, ask questions, or provide feedback on this chapter.</p>
-            <div className="flex items-center justify-center gap-4">
-              <Link href="/sign-in">
-                <Button variant="outline" className="h-11 px-6">Sign In</Button>
-              </Link>
-              <Link href="/sign-up">
-                <Button className="h-11 px-6 bg-primary hover:bg-primary/90">Sign Up</Button>
-              </Link>
-            </div>
+        <div className="border border-border/60 rounded-xl p-6 text-center bg-card/50">
+          <p className="text-sm text-muted-foreground mb-4">
+            Sign in to leave a comment and join the discussion.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Link href="/sign-in">
+              <Button variant="outline" size="sm">Sign in</Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Create account
+              </Button>
+            </Link>
           </div>
         </div>
       </Show>
 
+      {/* Comment form */}
       <Show when="signed-in">
-        <form onSubmit={handleSubmit} className="flex gap-4 items-start bg-card/50 p-6 rounded-2xl border border-border">
-          <Avatar className="w-12 h-12 border-2 border-background shadow-sm mt-1">
-            <AvatarImage src={user?.imageUrl} />
-            <AvatarFallback className="bg-primary/10 text-primary font-mono">{user?.firstName?.charAt(0) || "U"}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-4">
-            <Textarea 
-              placeholder="What are your thoughts?"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="resize-none min-h-[120px] bg-background border-border/50 focus-visible:ring-primary focus-visible:border-primary transition-all text-base p-4 rounded-xl"
-            />
-            <div className="flex justify-end">
-              <Button 
-                type="submit" 
-                disabled={!content.trim() || createComment.isPending}
-                className="gap-2 px-6 h-11 rounded-xl bg-primary hover:bg-primary/90 shadow-[0_0_15px_rgba(91,91,214,0.3)] transition-all"
-              >
-                <Send className="w-4 h-4" />
-                {createComment.isPending ? "Posting..." : "Post Comment"}
-              </Button>
-            </div>
+        <form onSubmit={(e) => { e.preventDefault(); if (!content.trim()) return; createComment.mutate({ postId, data: { content } }); }} className="space-y-3">
+          <Textarea
+            placeholder="Share your thoughts..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="resize-none min-h-[100px] text-sm"
+          />
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!content.trim() || createComment.isPending}
+              className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Send className="w-3.5 h-3.5" />
+              {createComment.isPending ? "Posting..." : "Post comment"}
+            </Button>
           </div>
         </form>
       </Show>
 
-      <div className="space-y-8 mt-12">
-        {comments.map(comment => (
-          <div key={comment.id} className="flex gap-5 group">
-            <Avatar className="w-12 h-12 border border-border shrink-0">
-              <AvatarFallback className="bg-secondary/10 text-secondary font-mono">{comment.authorName.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 space-y-2 bg-card border border-border/50 p-5 rounded-2xl rounded-tl-sm transition-colors hover:border-border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-foreground">{comment.authorName}</span>
-                  <span className="text-xs font-medium text-muted-foreground/80 font-mono">
-                    {format(new Date(comment.createdAt), 'MMM d, yyyy')}
+      {/* Comments list */}
+      <div className="space-y-4">
+        {comments.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">No comments yet. Be the first to share your thoughts.</p>
+        )}
+        {comments.map((comment) => (
+          <div key={comment.id} className="group flex gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center uppercase shrink-0 mt-0.5">
+              {comment.authorName.charAt(0)}
+            </div>
+            <div className="flex-1 bg-card border border-border/50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">{comment.authorName}</span>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    {format(new Date(comment.createdAt), "MMM d")}
                   </span>
                 </div>
-                {user && user.id === comment.authorId && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all rounded-full hover:bg-destructive/10"
+                {user?.id === comment.authorId && (
+                  <button
                     onClick={() => deleteComment.mutate({ postId, commentId: comment.id })}
-                    disabled={deleteComment.isPending}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 )}
               </div>
-              <p className="text-[15px] text-foreground/90 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
+              <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{comment.content}</p>
             </div>
           </div>
         ))}

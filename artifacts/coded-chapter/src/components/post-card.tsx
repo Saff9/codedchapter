@@ -1,76 +1,110 @@
 import { Link } from "wouter";
-import { Post } from "@workspace/api-client-react/src/generated/api.schemas";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, MessageSquare } from "lucide-react";
-import { format } from "date-fns";
+import { Clock, MessageCircle } from "lucide-react";
+
+const TAG_COLORS: Record<string, string> = {
+  python: "text-sky-400 bg-sky-400/10 border-sky-400/20",
+  javascript: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
+  html: "text-orange-400 bg-orange-400/10 border-orange-400/20",
+  css: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  beginners: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  journal: "text-violet-400 bg-violet-400/10 border-violet-400/20",
+  concepts: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+  functions: "text-rose-400 bg-rose-400/10 border-rose-400/20",
+  web: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
+};
+const FALLBACK_COLORS = [
+  "text-amber-400 bg-amber-400/10 border-amber-400/20",
+  "text-violet-400 bg-violet-400/10 border-violet-400/20",
+  "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  "text-sky-400 bg-sky-400/10 border-sky-400/20",
+];
+const STRIPE_COLORS: Record<string, string> = {
+  python: "bg-sky-500",
+  javascript: "bg-yellow-500",
+  html: "bg-orange-500",
+  css: "bg-blue-500",
+  beginners: "bg-emerald-500",
+  journal: "bg-violet-500",
+  concepts: "bg-amber-500",
+  functions: "bg-rose-500",
+  web: "bg-cyan-500",
+};
+
+function tagColor(tag: string, i: number) {
+  return TAG_COLORS[tag] ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length];
+}
+function stripeColor(tag: string) {
+  return STRIPE_COLORS[tag] ?? "bg-primary";
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+}
+
+interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  tags: string[];
+  authorName: string;
+  readingTimeMinutes: number;
+  commentCount: number;
+  createdAt: string;
+}
 
 export function PostCard({ post }: { post: Post }) {
-  // Simple deterministic color rotation based on tag string length
-  const getTagColor = (tag: string) => {
-    const colors = [
-      "bg-primary/10 text-primary hover:bg-primary/20",
-      "bg-secondary/10 text-secondary hover:bg-secondary/20",
-      "bg-purple-500/10 text-purple-400 hover:bg-purple-500/20",
-      "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
-    ];
-    return colors[tag.length % colors.length];
-  };
-
+  const primaryTag = post.tags[0] ?? "";
   return (
-    <Link href={`/blog/${post.id}`} className="block h-full outline-none">
-      <div className="relative h-full group rounded-2xl">
-        {/* Glow Shadow */}
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-500" />
-        
-        {/* Gradient Border Wrapper */}
-        <div className="relative h-full p-[1px] rounded-2xl bg-gradient-to-b from-border/50 to-transparent group-hover:from-primary/50 group-hover:to-secondary/50 transition-colors duration-500 overflow-hidden">
-          
-          {/* Shimmer Line */}
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <Link href={`/blog/${post.id}`}>
+      <article className="group relative h-full flex flex-col bg-card border border-border rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
+        {/* Colored top stripe */}
+        <div className={`h-[3px] w-full ${stripeColor(primaryTag)} opacity-50 group-hover:opacity-100 transition-opacity duration-300`} />
 
-          <Card className="h-full flex flex-col overflow-hidden bg-card border-none rounded-[15px]">
-            {post.coverImage && (
-              <div className="relative aspect-[2/1] w-full overflow-hidden">
-                <img 
-                  src={post.coverImage} 
-                  alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent opacity-60" />
-              </div>
-            )}
-            <CardHeader className="flex-1 p-6 pb-4">
-              <div className="flex items-center gap-2 mb-4 flex-wrap">
-                {post.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className={`${getTagColor(tag)} font-mono text-[11px] px-2 py-0.5 transition-colors border-transparent`}>
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
-              <h3 className="text-2xl font-display font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-tight">
-                {post.title}
-              </h3>
-              <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-relaxed font-light">
-                {post.excerpt}
-              </p>
-            </CardHeader>
-            <CardFooter className="p-6 pt-0 flex items-center justify-between text-xs text-muted-foreground/80 font-medium">
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5 group-hover:text-foreground/90 transition-colors">
-                  <Clock className="w-4 h-4 text-primary" />
-                  {post.readingTimeMinutes} min read
-                </span>
-                <span className="flex items-center gap-1.5 group-hover:text-foreground/90 transition-colors">
-                  <MessageSquare className="w-4 h-4 text-secondary" />
-                  {post.commentCount}
-                </span>
-              </div>
-              <span className="font-mono">{format(new Date(post.createdAt), 'MMM d, yy')}</span>
-            </CardFooter>
-          </Card>
+        <div className="flex flex-col flex-1 p-5 gap-3">
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {post.tags.slice(0, 3).map((tag, i) => (
+              <span
+                key={tag}
+                className={`inline-flex px-2 py-0.5 rounded-md border text-[10px] font-mono font-medium ${tagColor(tag, i)}`}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Title */}
+          <h3
+            className="text-[15px] font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2"
+            style={{ fontFamily: "Space Grotesk, sans-serif" }}
+          >
+            {post.title}
+          </h3>
+
+          {/* Excerpt */}
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+            {post.excerpt}
+          </p>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-3 border-t border-border/40 mt-auto">
+            <span className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</span>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {post.readingTimeMinutes} min
+              </span>
+              <span className="flex items-center gap-1">
+                <MessageCircle className="w-3 h-3" />
+                {post.commentCount}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }
