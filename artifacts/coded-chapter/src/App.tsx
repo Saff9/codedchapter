@@ -13,6 +13,12 @@ import BlogList from "./pages/blog-list";
 import BlogPost from "./pages/blog-post";
 import SignInPage from "./pages/sign-in";
 import SignUpPage from "./pages/sign-up";
+import WritePage from "./pages/write";
+import DoubtsListPage from "./pages/doubts-list";
+import AskDoubtPage from "./pages/ask-doubt";
+import DoubtDetailPage from "./pages/doubt-detail";
+import ProfilePage from "./pages/profile";
+import SettingsPage from "./pages/settings";
 import NotFound from "@/pages/not-found";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -69,6 +75,13 @@ function ClerkProviderWithRoutes() {
               <Route path="/" component={Home} />
               <Route path="/blog" component={BlogList} />
               <Route path="/blog/:id" component={BlogPost} />
+              <Route path="/write" component={WritePage} />
+              <Route path="/write/:id" component={WritePage} />
+              <Route path="/doubts" component={DoubtsListPage} />
+              <Route path="/doubts/ask" component={AskDoubtPage} />
+              <Route path="/doubts/:id" component={DoubtDetailPage} />
+              <Route path="/u/:username" component={ProfilePage} />
+              <Route path="/settings" component={SettingsPage} />
               <Route path="/sign-in/*?" component={SignInPage} />
               <Route path="/sign-up/*?" component={SignUpPage} />
               <Route component={NotFound} />

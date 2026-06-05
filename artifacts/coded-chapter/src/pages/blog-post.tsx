@@ -1,4 +1,4 @@
-import { useGetPost, useListComments, useCreateComment, useDeleteComment } from "@workspace/api-client-react";
+import { useGetPost, useListComments, useCreateComment, useDeleteComment, getGetPostQueryKey, getListCommentsQueryKey } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
 import { Show, useUser } from "@clerk/react";
 import { format } from "date-fns";
@@ -27,8 +27,8 @@ export default function BlogPost() {
   const { id } = useParams<{ id: string }>();
   const postId = parseInt(id || "0", 10);
 
-  const { data: post, isLoading } = useGetPost(postId, { query: { enabled: !!postId } });
-  const { data: comments } = useListComments(postId, { query: { enabled: !!postId } });
+  const { data: post, isLoading } = useGetPost(postId, { query: { enabled: !!postId, queryKey: getGetPostQueryKey(postId) } });
+  const { data: comments } = useListComments(postId, { query: { enabled: !!postId, queryKey: getListCommentsQueryKey(postId) } });
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });

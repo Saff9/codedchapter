@@ -141,6 +141,64 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const auth = getAuth(req);
+    const userId = auth?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const [post] = await db.select().from(postsTable).where(eq(postsTable.id, id));
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    if (post.authorId !== userId) return res.status(403).json({ error: "Forbidden" });
+
+    const parsed = CreatePostBody.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error });
+
+    const { title, excerpt, content, tags, coverImage } = parsed.data;
+    const readingTimeMinutes = estimateReadingTime(content);
+
+    const [updated] = await db.update(postsTable).set({
+      title,
+      slug: slugify(title, id),
+      excerpt,
+      content,
+      tags: tags ?? [],
+      coverImage: coverImage ?? null,
+      readingTimeMinutes,
+      updatedAt: new Date(),
+    }).where(eq(postsTable.id, id)).returning();
+
+    res.json({ ...updated, commentCount: 0 });
+  } catch (err) {
+    req.log.error({ err }, "Failed to update post");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const auth = getAuth(req);
+    const userId = auth?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const [post] = await db.select().from(postsTable).where(eq(postsTable.id, id));
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    if (post.authorId !== userId) return res.status(403).json({ error: "Forbidden" });
+
+    await db.delete(postsTable).where(eq(postsTable.id, id));
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Failed to delete post");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/", async (req, res) => {
   try {
     const auth = getAuth(req);
