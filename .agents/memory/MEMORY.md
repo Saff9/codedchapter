@@ -1,2 +1,0 @@
-- [TanStack Query v5 + Orval queryKey](tanstack-orval-querykey.md) — generated hooks require queryKey in UseQueryOptions; pass it from the query key helper
-- [api-zod duplicate export fix](api-zod-duplicate-export.md) — types/ and generated/api.ts both export same names; keep only api.ts in index.ts

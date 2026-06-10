@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico|woff2?))",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/blog/(?<id>\\d+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "User-Agent",
+          "value": ".*(Twitterbot|Discordbot|facebookexternalhit|WhatsApp|Googlebot|Bingbot|Slackbot).*"
+        }
+      ],
+      "dest": "api/index.ts"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.ts"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

@@ -1,212 +1,130 @@
 # Coded Chapter
 
-> A personal developer blog for documenting the journey from beginner to software engineer — with a community Q&A section, developer profiles, and a full post editor.
+Personal dev log + Q&A board. I built this to write down what I'm learning — from finishing 10th/12th under J&K BOSE to picking up Python, web dev, and whatever comes next in college.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-
----
-
-## ✨ Features
-
-### Blog
-- **Posts** — full markdown-style blog posts with reading progress bar, cover images, tags, and reading time
-- **Comments** — threaded comments on each post; login required to post
-- **Tag filtering** — browse posts by topic on the blog listing page
-- **Featured posts** — homepage highlights the latest chapters
-
-### Community Doubts
-- **Ask a Doubt** — post a question to the community (login required)
-- **Answers** — any logged-in user can answer; doubt author can accept the best answer
-- **Resolved/Open status** — doubts are marked resolved when an answer is accepted
-- **Tag & search filtering** — find doubts by topic or keyword
-
-### Developer Profiles
-- **Unique @username** — every user picks a unique handle
-- **Public profile page** — visible at `/u/username`
-- **Profile details** — display name, bio, location, website, GitHub, Twitter
-- **Activity tabs** — see a user's posts and doubts in one place
-
-### Post Editor
-- **Write & publish** — any logged-in user can author posts
-- **Edit & delete** — authors can update or remove their own posts
-- **Live preview** — toggle between editor and rendered preview
-- **Tag management** — add up to 5 tags per post
-
-### Auth
-- **Clerk** — sign up / sign in with email or social providers
-- **Protected routes** — commenting, writing, asking doubts all require login
+Stack: React 19 + Vite frontend, Express 5 + Drizzle + Postgres backend. Deploys on Vercel.
 
 ---
 
-## 🛠 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| **Monorepo** | pnpm workspaces |
-| **Frontend** | React 19 + Vite + TypeScript |
-| **Styling** | Tailwind CSS v4 + Framer Motion |
-| **UI Components** | Radix UI primitives (via shadcn/ui) |
-| **Backend** | Express 5 + TypeScript |
-| **Database** | PostgreSQL (Replit built-in) |
-| **ORM** | Drizzle ORM + drizzle-zod |
-| **Auth** | Clerk |
-| **API Contract** | OpenAPI spec + Orval codegen |
-| **Validation** | Zod v4 |
-| **Node** | 24 |
-
----
-
-## 📁 Project Structure
+## Repo layout
 
 ```
-coded-chapter/
-├── artifacts/
-│   ├── coded-chapter/       # React + Vite frontend
-│   └── api-server/          # Express 5 API server
-├── lib/
-│   ├── db/                  # Drizzle schema + DB client
-│   ├── api-spec/            # OpenAPI specification
-│   ├── api-zod/             # Generated Zod validators
-│   └── api-client-react/    # Generated React Query hooks
-└── scripts/                 # Utility scripts
+frontend/   React app
+backend/    Express API + Drizzle
+api/        Vercel serverless entry (re-exports backend/src/app)
 ```
 
 ---
 
-## 🗄 Database Schema
-
-| Table | Description |
-|---|---|
-| `posts` | Blog posts with title, content, tags, author, reading time |
-| `comments` | Comments on posts; linked to Clerk user |
-| `profiles` | User profiles with unique username, bio, links |
-| `doubts` | Community Q&A questions |
-| `doubt_answers` | Answers to doubts; one can be marked accepted |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 24+
-- pnpm 9+
-- A PostgreSQL database (Replit provides one automatically)
-- A [Clerk](https://clerk.com) account
-
-### Environment Variables
-
-Create a `.env` file in `artifacts/coded-chapter/` and `artifacts/api-server/`:
-
-```env
-# Clerk (both frontend and backend need these)
-VITE_CLERK_PUBLISHABLE_KEY=pk_...
-CLERK_SECRET_KEY=sk_...
-VITE_CLERK_PROXY_URL=/__clerk
-
-# Database
-DATABASE_URL=postgresql://...
-```
-
-### Install & Run
+## Local dev
 
 ```bash
-# Install all dependencies
 pnpm install
-
-# Push database schema
-pnpm --filter @workspace/db run push
-
-# Start development servers
-pnpm --filter @workspace/api-server run dev
-pnpm --filter @workspace/coded-chapter run dev
+cp .env.example .env   # fill in what you have
+pnpm run dev
 ```
 
-### Regenerate API Client
+Frontend: http://localhost:5173  
+API: http://localhost:5000
 
-After changing the OpenAPI spec:
+Without `DATABASE_URL` and Supabase keys → preview mode (in-memory DB + mock auth).
 
-```bash
-pnpm --filter @workspace/api-spec run codegen
+---
+
+## Production deploy (Vercel)
+
+### 1. Services to set up first
+
+| Service | Why |
+|---------|-----|
+| **Supabase** | Postgres + auth |
+| **Upstash Redis** | Rate limiting across serverless instances (free tier is fine to start) |
+
+### 2. Vercel environment variables
+
+Set all of these in **Vercel → Project → Settings → Environment Variables**.
+
+**Build + runtime (backend):**
+```
+DATABASE_URL=postgresql://...pooler.supabase.com:6543/postgres?sslmode=require
+SUPABASE_JWT_SECRET=...
+ADMIN_EMAIL=your@email.com
+FRONTEND_URL=https://your-domain.vercel.app
+UPSTASH_REDIS_REST_URL=https://....upstash.io
+UPSTASH_REDIS_REST_TOKEN=...
 ```
 
-### Type Check
+**Build time only (frontend — must exist before deploy builds):**
+```
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=...
+VITE_ADMIN_EMAIL=your@email.com
+```
+
+Use Supabase's **connection pooler** URL (port `6543`), not the direct `5432` URL — serverless needs pooling.
+
+### 3. Deploy
+
+Push to GitHub → connect repo in Vercel → set build command to `pnpm run vercel-build`.
+
+Migrations run automatically during `vercel-build` when `DATABASE_URL` is set.
+
+### 4. Post-deploy smoke test
+
+- [ ] Homepage loads
+- [ ] Sign up / sign in works
+- [ ] Admin can write a post
+- [ ] Non-admin cannot see Write button
+- [ ] Doubts list loads
+- [ ] Share a blog post link — OG preview shows correct title
+
+---
+
+## Env reference
+
+See [`.env.example`](.env.example) for the full list with comments.
+
+---
+
+## Database
 
 ```bash
+# generate new migration after schema change
+cd backend && npx drizzle-kit generate
+
+# apply migrations locally or in CI
+pnpm run migrate
+```
+
+---
+
+## Performance (heavy traffic)
+
+What's already wired in:
+
+- **Upstash Redis** rate limits (300 reads/min, 30 writes/min per IP)
+- **GIN indexes** on tag arrays + btree indexes on hot columns
+- **Cache-Control** headers on read API routes
+- **gzip compression** on API responses
+- **React Query** 60s stale time on the frontend
+- **Vercel CDN** caching for static assets (1 year on hashed JS/CSS)
+
+---
+
+## Scripts
+
+```bash
+pnpm run dev
 pnpm run typecheck
+pnpm run build
+pnpm run migrate
+pnpm run vercel-build
 ```
 
----
-
-## 🔑 Key Routes
-
-| Route | Description |
-|---|---|
-| `/` | Homepage with hero and featured posts |
-| `/blog` | All posts with tag filtering |
-| `/blog/:id` | Individual post with comments |
-| `/doubts` | Community Q&A listing |
-| `/doubts/ask` | Post a new question |
-| `/doubts/:id` | View question + answers |
-| `/write` | Create a new post |
-| `/write/:id` | Edit an existing post |
-| `/u/:username` | Public developer profile |
-| `/settings` | Edit your own profile |
-| `/sign-in` | Clerk sign-in |
-| `/sign-up` | Clerk sign-up |
-
-### API Endpoints
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `GET` | `/api/posts` | — | List posts |
-| `GET` | `/api/posts/featured` | — | Featured posts |
-| `GET` | `/api/posts/tags` | — | All tags |
-| `GET` | `/api/posts/:id` | — | Single post |
-| `POST` | `/api/posts` | ✅ | Create post |
-| `PUT` | `/api/posts/:id` | ✅ owner | Update post |
-| `DELETE` | `/api/posts/:id` | ✅ owner | Delete post |
-| `GET` | `/api/posts/:id/comments` | — | List comments |
-| `POST` | `/api/posts/:id/comments` | ✅ | Add comment |
-| `DELETE` | `/api/posts/:id/comments/:commentId` | ✅ owner | Delete comment |
-| `GET` | `/api/profiles/me` | ✅ | Own profile |
-| `GET` | `/api/profiles/:username` | — | Public profile |
-| `POST` | `/api/profiles` | ✅ | Create/update profile |
-| `GET` | `/api/doubts` | — | List doubts |
-| `POST` | `/api/doubts` | ✅ | Ask a doubt |
-| `GET` | `/api/doubts/:id` | — | Doubt + answers |
-| `DELETE` | `/api/doubts/:id` | ✅ owner | Delete doubt |
-| `POST` | `/api/doubts/:id/answers` | ✅ | Post answer |
-| `PATCH` | `/api/doubts/:id/answers/:id/accept` | ✅ author | Accept answer |
-| `DELETE` | `/api/doubts/:id/answers/:id` | ✅ owner | Delete answer |
+CI runs typecheck + build on every push to `main` (see `.github/workflows/ci.yml`).
 
 ---
 
-## 🗺 Roadmap
+## License
 
-- [ ] Rich text / WYSIWYG editor (TipTap)
-- [ ] Post drafts & scheduled publishing
-- [ ] Upvotes on doubts and answers
-- [ ] Email notifications for answers
-- [ ] Search (full-text across posts and doubts)
-- [ ] Series / collections grouping for posts
-- [ ] RSS feed
-- [ ] Dark/light theme toggle
-- [ ] Admin dashboard for content moderation
-- [ ] Bookmarks / reading list
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Open a pull request
-
----
-
-## 📄 License
-
-[MIT](./LICENSE) © Coded Chapter
+MIT — see [LICENSE](LICENSE).

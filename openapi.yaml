@@ -1,0 +1,668 @@
+openapi: 3.0.3
+info:
+  title: Coded Chapter API
+  description: Backend API endpoints for Coded Chapter, a Q&A and dev log blogging platform.
+  version: 1.0.0
+servers:
+  - url: /api
+    description: Vercel serverless / local proxy base path
+paths:
+  /posts:
+    get:
+      summary: List blog posts
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [tech, general]
+        - name: tag
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: authorId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Create a blog post
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostInput'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          description: Unauthorized
+
+  /posts/featured:
+    get:
+      summary: List featured tech posts
+      responses:
+        '200':
+          description: A list of featured posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+
+  /posts/tags:
+    get:
+      summary: List all tags used in posts
+      responses:
+        '200':
+          description: List of tag strings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /posts/{id}:
+    get:
+      summary: Get a post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed post info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: Post not found
+    put:
+      summary: Update a post by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostInput'
+      responses:
+        '200':
+          description: Post updated successfully
+        '403':
+          description: Forbidden (Not the author)
+        '404':
+          description: Post not found
+    delete:
+      summary: Delete a post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post deleted successfully
+        '403':
+          description: Forbidden (Not the author)
+        '404':
+          description: Post not found
+
+  /posts/{postId}/comments:
+    get:
+      summary: List comments for a post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      summary: Add a comment to a post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  /posts/{postId}/comments/{commentId}:
+    delete:
+      summary: Delete a comment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment deleted
+        '403':
+          description: Forbidden (Not the comment author)
+
+  /profiles/me:
+    get:
+      summary: Get current authenticated user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          description: Unauthorized
+
+  /profiles/{username}:
+    get:
+      summary: Get user profile details by username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile and statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileWithStats'
+        '404':
+          description: Profile not found
+
+  /profiles/check-username/{username}:
+    get:
+      summary: Check if a username is available for registration
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+
+  /profiles:
+    post:
+      summary: Create or update user profile details
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileInput'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+
+  /doubts:
+    get:
+      summary: List community doubts
+      parameters:
+        - name: tag
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of doubts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Doubt'
+    post:
+      summary: Create a new doubt
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDoubtInput'
+      responses:
+        '201':
+          description: Doubt created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doubt'
+
+  /doubts/{id}:
+    get:
+      summary: Get doubt details by ID (including answers list)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed doubt info with answers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoubtWithAnswers'
+        '404':
+          description: Doubt not found
+    delete:
+      summary: Delete a doubt
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Doubt deleted successfully
+        '403':
+          description: Forbidden (Not the doubt author)
+
+  /doubts/{doubtId}/answers:
+    post:
+      summary: Submit an answer to a doubt
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: doubtId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Answer submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+
+  /doubts/{doubtId}/answers/{answerId}:
+    delete:
+      summary: Delete an answer
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: doubtId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Answer deleted
+        '403':
+          description: Forbidden (Not the answer author)
+
+  /doubts/{doubtId}/answers/{answerId}/accept:
+    patch:
+      summary: Accept an answer (Doubt author only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: doubtId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: answerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Answer accepted successfully
+        '403':
+          description: Forbidden (Not the doubt author)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          enum: [tech, general]
+        authorId:
+          type: string
+        authorName:
+          type: string
+        authorUsername:
+          type: string
+          nullable: true
+        coverImage:
+          type: string
+          nullable: true
+        readingTimeMinutes:
+          type: integer
+        commentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreatePostInput:
+      type: object
+      required:
+        - title
+        - excerpt
+        - content
+      properties:
+        title:
+          type: string
+        excerpt:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+          enum: [tech, general]
+          default: tech
+        coverImage:
+          type: string
+          nullable: true
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        postId:
+          type: integer
+        authorId:
+          type: string
+        authorName:
+          type: string
+        authorUsername:
+          type: string
+          nullable: true
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+        githubUrl:
+          type: string
+          nullable: true
+        twitterUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProfileWithStats:
+      allOf:
+        - $ref: '#/components/schemas/Profile'
+        - type: object
+          properties:
+            postsCount:
+              type: integer
+            doubtsCount:
+              type: integer
+            answersCount:
+              type: integer
+    ProfileInput:
+      type: object
+      required:
+        - username
+        - displayName
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        bio:
+          type: string
+        location:
+          type: string
+        website:
+          type: string
+        githubUrl:
+          type: string
+        twitterUrl:
+          type: string
+    Doubt:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        authorId:
+          type: string
+        authorName:
+          type: string
+        authorUsername:
+          type: string
+          nullable: true
+        isResolved:
+          type: boolean
+        answerCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateDoubtInput:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    Answer:
+      type: object
+      properties:
+        id:
+          type: integer
+        doubtId:
+          type: integer
+        content:
+          type: string
+        authorId:
+          type: string
+        authorName:
+          type: string
+        authorUsername:
+          type: string
+          nullable: true
+        isAccepted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    DoubtWithAnswers:
+      allOf:
+        - $ref: '#/components/schemas/Doubt'
+        - type: object
+          properties:
+            answers:
+              type: array
+              items:
+                $ref: '#/components/schemas/Answer'
