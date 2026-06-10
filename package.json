@@ -10,6 +10,7 @@
     "migrate": "pnpm --filter backend migrate"
   },
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "devDependencies": {
     "typescript": "~5.9.2",
     "prettier": "^3.8.1"
