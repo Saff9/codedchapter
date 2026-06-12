@@ -31,52 +31,31 @@ Without `DATABASE_URL` and Supabase keys → preview mode (in-memory DB + mock a
 
 ---
 
-## Production deploy (Vercel)
+## Production Deploy (Split Architecture)
 
-### 1. Services to set up first
+This project is configured as a split deployment:
+* **Frontend**: React SPA deployed on **Vercel**.
+* **Backend**: Node/Express server deployed on **Render**.
 
-| Service | Why |
-|---------|-----|
-| **Supabase** | Postgres + auth |
-| **Upstash Redis** | Rate limiting across serverless instances (free tier is fine to start) |
+### 1. Backend Deploy (Render) - One-Click Blueprint
 
-### 2. Vercel environment variables
+You can deploy the backend to Render in a single click using this button:
 
-Set all of these in **Vercel → Project → Settings → Environment Variables**.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Saff9/codedchapter)
 
-**Build + runtime (backend):**
-```
-DATABASE_URL=postgresql://...pooler.supabase.com:6543/postgres?sslmode=require
-SUPABASE_JWT_SECRET=...
-ADMIN_EMAIL=your@email.com
-FRONTEND_URL=https://your-domain.vercel.app
-UPSTASH_REDIS_REST_URL=https://....upstash.io
-UPSTASH_REDIS_REST_TOKEN=...
-```
+Render will parse the `render.yaml` blueprint and prompt you for the following environment variables:
+* `DATABASE_URL`: Your Supabase connection string.
+* `FRONTEND_URL`: Your Vercel frontend URL (e.g. `https://codedchapter.vercel.app`).
+* `SUPABASE_JWT_SECRET`: Your Supabase JWT secret.
 
-**Build time only (frontend — must exist before deploy builds):**
-```
-VITE_SUPABASE_URL=https://xxx.supabase.co
-VITE_SUPABASE_ANON_KEY=...
-VITE_ADMIN_EMAIL=your@email.com
-```
+### 2. Frontend Deploy (Vercel)
 
-Use Supabase's **connection pooler** URL (port `6543`), not the direct `5432` URL — serverless needs pooling.
-
-### 3. Deploy
-
-Push to GitHub → connect repo in Vercel → set build command to `pnpm run vercel-build`.
-
-Migrations run automatically during `vercel-build` when `DATABASE_URL` is set.
-
-### 4. Post-deploy smoke test
-
-- [ ] Homepage loads
-- [ ] Sign up / sign in works
-- [ ] Admin can write a post
-- [ ] Non-admin cannot see Write button
-- [ ] Doubts list loads
-- [ ] Share a blog post link — OG preview shows correct title
+1. Connect your repository to Vercel.
+2. In Vercel, set the following environment variables:
+   * `VITE_API_URL`: Your Render backend URL (e.g. `https://codedchapter-backend.onrender.com`).
+   * `VITE_SUPABASE_URL`: Your Supabase URL.
+   * `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key.
+3. Vercel will build the frontend from the root using the `vercel-build` script, and host it statically.
 
 ---
 
