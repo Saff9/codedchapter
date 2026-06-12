@@ -5,6 +5,7 @@ import path from "path";
 import * as schema from "./schema";
 
 const { Pool } = pg;
+pg.defaults.ssl = { rejectUnauthorized: false };
 
 export let pool: pg.Pool | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
