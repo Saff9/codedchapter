@@ -7,5 +7,9 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
 
   if (res.headersSent) return;
 
-  res.status(500).json({ error: "Internal server error" });
+  res.status(500).json({
+    error: "Internal server error",
+    message: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
 }

@@ -19,9 +19,13 @@ router.get("/", cachePublic(60), async (req, res) => {
 
     const posts = await repo.listPosts(category, tag, limit, offset, authorId);
     return res.json(posts);
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Failed to list posts");
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({
+      error: "Internal server error",
+      message: err?.message || String(err),
+      stack: err?.stack,
+    });
   }
 });
 
@@ -29,9 +33,13 @@ router.get("/featured", cachePublic(120), async (req, res) => {
   try {
     const posts = await repo.getFeaturedPosts();
     res.json(posts);
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Failed to get featured posts");
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      error: "Internal server error",
+      message: err?.message || String(err),
+      stack: err?.stack,
+    });
   }
 });
 
@@ -39,9 +47,13 @@ router.get("/tags", cachePublic(300), async (req, res) => {
   try {
     const tags = await repo.getAllTags();
     res.json(tags);
-  } catch (err) {
+  } catch (err: any) {
     req.log.error({ err }, "Failed to get tags");
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({
+      error: "Internal server error",
+      message: err?.message || String(err),
+      stack: err?.stack,
+    });
   }
 });
 
