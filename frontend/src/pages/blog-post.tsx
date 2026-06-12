@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { sanitizeHtml, updateMetaTags } from "@/lib/utils";
+import { SiSubstack } from "react-icons/si";
 
 const TAG_COLORS: Record<string, string> = {
   python: "text-sky-400 bg-sky-400/10 border-sky-400/20",
@@ -169,22 +170,36 @@ export default function BlogPost() {
               </span>
             </div>
 
-            {user?.id === post.authorId && (
-              <div className="flex items-center gap-2">
-                <Link href={`/write/${post.id}`}>
-                  <button className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors bg-card font-medium">
-                    <Pencil className="w-3 h-3 text-primary" /> Edit
-                  </button>
-                </Link>
-                <button
-                  onClick={handleDelete}
-                  disabled={deletePostMutation.isPending}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-destructive/20 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/50 transition-colors bg-card font-medium"
+            <div className="flex items-center gap-2">
+              {post.substackUrl && (
+                <a
+                  href={post.substackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#FF6719]/35 text-xs text-[#FF6719] hover:text-white hover:bg-[#FF6719] transition-all bg-card font-medium shadow-sm cursor-pointer"
                 >
-                  <Trash2 className="w-3 h-3 text-destructive" /> Delete
-                </button>
-              </div>
-            )}
+                  <SiSubstack className="w-3.5 h-3.5" />
+                  Read on Substack
+                </a>
+              )}
+
+              {user?.id === post.authorId && (
+                <>
+                  <Link href={`/write/${post.id}`}>
+                    <button className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors bg-card font-medium">
+                      <Pencil className="w-3 h-3 text-primary" /> Edit
+                    </button>
+                  </Link>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deletePostMutation.isPending}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-destructive/20 text-xs text-muted-foreground hover:text-destructive hover:border-destructive/50 transition-colors bg-card font-medium"
+                  >
+                    <Trash2 className="w-3 h-3 text-destructive" /> Delete
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Web Search Integration */}
@@ -237,7 +252,11 @@ export default function BlogPost() {
             prose-code:text-amber-400 prose-code:bg-amber-400/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none
             prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic
             prose-strong:text-foreground"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(marked.parse(post.content) as string) }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(
+              post.isHtml ? (post.content || "") : (marked.parse(post.content || "") as string)
+            )
+          }}
         />
 
         <hr className="my-14 border-border/40" />

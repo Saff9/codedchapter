@@ -52,7 +52,7 @@ const SOCIAL_LINKS: SocialLink[] = [
   },
   {
     name: "Substack Newsletter",
-    url: "https://codedchapter.substack.com/",
+    url: import.meta.env.VITE_SUBSTACK_URL || "https://codedchapter.substack.com/",
     icon: <SiSubstack className="w-5 h-5 text-[#FF6719]" />,
     gradient: "from-amber-950/80 to-amber-900/50",
     borderColor: "border-amber-500/30",

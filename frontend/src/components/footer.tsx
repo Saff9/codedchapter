@@ -11,30 +11,25 @@ export function Footer() {
   const { user } = useAuth();
   const isAdmin = isAdminEmail(user?.email);
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const { toast } = useToast();
+  
+  const SUBSTACK_URL = import.meta.env.VITE_SUBSTACK_URL || "https://codedchapter.substack.com";
 
-  const handleSubscribe = async (e: React.FormEvent) => {
+  const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    setLoading(true);
-    // Simulate API request
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
+    
+    // Open Substack subscribe page with pre-filled email in new tab
+    const url = `${SUBSTACK_URL.replace(/\/$/, "")}/subscribe?email=${encodeURIComponent(email)}`;
+    window.open(url, "_blank");
+    
     setSubscribed(true);
     setEmail("");
-    
-    // Save to simulated storage
-    const subs = JSON.parse(localStorage.getItem("newsletter_subscriptions") || "[]");
-    if (!subs.includes(email)) {
-      subs.push(email);
-      localStorage.setItem("newsletter_subscriptions", JSON.stringify(subs));
-    }
 
     toast({
-      title: "Saved locally",
-      description: "Demo only — hook this up to Substack or Mailchimp when you're ready.",
+      title: "Redirecting to Substack",
+      description: "Opening the subscription form in a new tab.",
     });
   };
 
@@ -101,12 +96,12 @@ export function Footer() {
           <div className="md:col-span-4 space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Newsletter</h4>
             <p className="text-xs text-muted-foreground">
-              Email signup (demo — stores in your browser for now). Real list lives on Substack.
+              Subscribe to my Substack newsletter to get logs and updates directly in your inbox.
             </p>
             {subscribed ? (
               <div className="text-xs text-emerald-400 font-medium flex items-center gap-1.5 pt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Subscribed successfully! (Saved locally for demo)
+                Subscription page opened in a new tab!
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm pt-1">
@@ -123,10 +118,9 @@ export function Footer() {
                 </div>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-3.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center shrink-0 disabled:opacity-60"
+                  className="px-3.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center shrink-0"
                 >
-                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                  <Send className="w-3.5 h-3.5" />
                 </button>
               </form>
             )}
@@ -153,7 +147,7 @@ export function Footer() {
             <a href="https://discord.gg/5zwAUuD4Ec" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer" aria-label="Discord">
               <FaDiscord className="w-4 h-4" />
             </a>
-            <a href="https://codedchapter.substack.com/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center" aria-label="Substack">
+            <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center" aria-label="Substack">
               <SiSubstack className="w-3.5 h-3.5" />
             </a>
           </div>
