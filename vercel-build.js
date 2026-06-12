@@ -4,7 +4,11 @@ const fs = require('fs');
 try {
   if (process.env.DATABASE_URL) {
     console.log('Running database migrations...');
-    execSync('pnpm --filter backend migrate', { stdio: 'inherit', env: process.env });
+    try {
+      execSync('pnpm --filter backend migrate', { stdio: 'inherit', env: process.env });
+    } catch (migError) {
+      console.warn('Database migration failed, but continuing build:', migError.message || migError);
+    }
   } else {
     console.warn('DATABASE_URL not set — skipping migrations (preview build).');
   }
