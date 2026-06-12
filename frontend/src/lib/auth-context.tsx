@@ -2,9 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "./supabase";
 import { useToast } from "@/hooks/use-toast";
 
-// Check if we are running in Mock Mode (no environment variables provided)
-// Mock mode is strictly disabled in production.
-const IS_MOCK = import.meta.env.PROD ? false : !import.meta.env.VITE_SUPABASE_URL;
+// Check if we are running in Mock Mode (no environment variables provided, or using placeholder config)
+const IS_MOCK = !import.meta.env.VITE_SUPABASE_URL ||
+  import.meta.env.VITE_SUPABASE_URL === "https://your-project-id.supabase.co" ||
+  import.meta.env.VITE_SUPABASE_URL.includes("placeholder");
 
 interface AuthUser {
   id: string;

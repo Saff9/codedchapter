@@ -222,7 +222,7 @@ export default function BlogPost() {
         {/* Cover image */}
         {post.coverImage && (
           <div className="relative rounded-xl overflow-hidden mb-10 border border-border">
-            <img src={post.coverImage} alt={post.title} className="w-full object-cover" />
+            <img src={post.coverImage} alt={post.title} loading="lazy" className="w-full object-cover" />
           </div>
         )}
 

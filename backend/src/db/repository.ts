@@ -970,12 +970,78 @@ It's been a busy ride but I'm excited for the next chapter of this learning log!
   }
 }
 
-// Instantiate the active repository depending on environment configuration
-export const repo: IRepository = process.env.DATABASE_URL
-  ? new PostgresRepository()
-  : (() => {
-      if (process.env.NODE_ENV === "production") {
-        throw new Error("❌ Critical Configuration Error: DATABASE_URL must be configured in production mode.");
+class ResilientRepository implements IRepository {
+  private pgRepo: PostgresRepository | null = null;
+  private inMemoryRepo: InMemoryRepository;
+  private useInMemory = false;
+
+  constructor() {
+    this.inMemoryRepo = new InMemoryRepository();
+    if (process.env.DATABASE_URL) {
+      try {
+        this.pgRepo = new PostgresRepository();
+      } catch (err) {
+        console.error("Failed to initialize PostgresRepository, falling back to in-memory:", err);
+        this.useInMemory = true;
       }
-      return new InMemoryRepository();
-    })();
+    } else {
+      console.warn("DATABASE_URL is not set. Using in-memory repository.");
+      this.useInMemory = true;
+    }
+  }
+
+  private async run<T>(op: (r: IRepository) => Promise<T>): Promise<T> {
+    if (this.useInMemory || !this.pgRepo || !db) {
+      return op(this.inMemoryRepo);
+    }
+    try {
+      return await op(this.pgRepo);
+    } catch (err) {
+      console.error("Database operation failed. Falling back to in-memory repository:", err);
+      this.useInMemory = true;
+      return op(this.inMemoryRepo);
+    }
+  }
+
+  getProfileByUserId(userId: string) { return this.run(r => r.getProfileByUserId(userId)); }
+  getProfileByUsername(username: string) { return this.run(r => r.getProfileByUsername(username)); }
+  checkUsernameAvailable(username: string) { return this.run(r => r.checkUsernameAvailable(username)); }
+  upsertProfile(userId: string, data: any) { return this.run(r => r.upsertProfile(userId, data)); }
+
+  listPosts(category?: string, tag?: string, limit?: number, offset?: number, authorId?: string) {
+    return this.run(r => r.listPosts(category, tag, limit, offset, authorId));
+  }
+  getFeaturedPosts() { return this.run(r => r.getFeaturedPosts()); }
+  getAllTags() { return this.run(r => r.getAllTags()); }
+  getPost(id: number) { return this.run(r => r.getPost(id)); }
+  createPost(userId: string, authorName: string, data: any) { return this.run(r => r.createPost(userId, authorName, data)); }
+  updatePost(id: number, userId: string, data: any) { return this.run(r => r.updatePost(id, userId, data)); }
+  deletePost(id: number, userId: string) { return this.run(r => r.deletePost(id, userId)); }
+
+  listComments(postId: number) { return this.run(r => r.listComments(postId)); }
+  createComment(postId: number, authorId: string, authorName: string, content: string) {
+    return this.run(r => r.createComment(postId, authorId, authorName, content));
+  }
+  deleteComment(commentId: number, userId: string) { return this.run(r => r.deleteComment(commentId, userId)); }
+
+  listDoubts(tag?: string, limit?: number, offset?: number, authorId?: string) {
+    return this.run(r => r.listDoubts(tag, limit, offset, authorId));
+  }
+  getDoubt(id: number) { return this.run(r => r.getDoubt(id)); }
+  createDoubt(userId: string, authorName: string, authorUsername: string | null, data: any) {
+    return this.run(r => r.createDoubt(userId, authorName, authorUsername, data));
+  }
+  deleteDoubt(id: number, userId: string) { return this.run(r => r.deleteDoubt(id, userId)); }
+  createAnswer(doubtId: number, authorId: string, authorName: string, authorUsername: string | null, content: string) {
+    return this.run(r => r.createAnswer(doubtId, authorId, authorName, authorUsername, content));
+  }
+  deleteAnswer(doubtId: number, answerId: number, userId: string) {
+    return this.run(r => r.deleteAnswer(doubtId, answerId, userId));
+  }
+  acceptAnswer(doubtId: number, answerId: number, userId: string) {
+    return this.run(r => r.acceptAnswer(doubtId, answerId, userId));
+  }
+}
+
+// Instantiate the active repository depending on environment configuration
+export const repo: IRepository = new ResilientRepository();

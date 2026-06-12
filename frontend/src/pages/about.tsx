@@ -52,12 +52,12 @@ const MILESTONES = [
 ];
 
 const PHOTOS = [
-  { src: "/photo1.jpg", alt: "Owais by a mountain river" },
-  { src: "/photo2.jpg", alt: "Owais selfie in snowy mountains" },
-  { src: "/photo3.jpg", alt: "Owais looking up in the pine forest" },
-  { src: "/photo4.jpg", alt: "Owais mirror selfie" },
-  { src: "/photo5.jpg", alt: "Owais sitting on a log in the forest" },
-  { src: "/photo6.jpg", alt: "Owais looking at hills and valley" }
+  { src: "/photo1.webp", alt: "Owais by a mountain river" },
+  { src: "/photo2.webp", alt: "Owais selfie in snowy mountains" },
+  { src: "/photo3.webp", alt: "Owais looking up in the pine forest" },
+  { src: "/photo4.webp", alt: "Owais mirror selfie" },
+  { src: "/photo5.webp", alt: "Owais sitting on a log in the forest" },
+  { src: "/photo6.webp", alt: "Owais looking at hills and valley" }
 ];
 
 export default function AboutPage() {
@@ -117,6 +117,9 @@ export default function AboutPage() {
             <img
               src="/avatar.png"
               alt="Developer Avatar"
+              width="128"
+              height="128"
+              loading="eager"
               className="relative w-32 h-32 rounded-full object-cover border-2 border-primary/40 shadow-xl"
             />
           </div>

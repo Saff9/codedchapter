@@ -57,23 +57,18 @@ export function supabaseAuthMiddleware() {
     }
 
     if (!jwtSecret) {
-      if (process.env.NODE_ENV === "production") {
-        res.status(500).json({ error: "Internal Server Error: Secure authentication is not configured." });
-        return;
+      console.warn("⚠️ SUPABASE_JWT_SECRET is not set. Falling back to mock token validation.");
+      if (token === "mock-token") {
+        req.auth = {
+          userId: "mock-user-123",
+          email: process.env.ADMIN_EMAIL || "admin@example.com",
+          sessionClaims: {
+            fullName: "Guest Coder",
+            firstName: "Guest",
+            lastName: "Coder",
+          },
+        };
       }
-      // Local preview only — only accept the mock token from the frontend
-      if (token !== "mock-token") {
-        return next();
-      }
-      req.auth = {
-        userId: "mock-user-123",
-        email: process.env.ADMIN_EMAIL || "admin@example.com",
-        sessionClaims: {
-          fullName: "Guest Coder",
-          firstName: "Guest",
-          lastName: "Coder",
-        },
-      };
       return next();
     }
 

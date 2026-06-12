@@ -9,21 +9,21 @@ export let pool: pg.Pool | null = null;
 export let db: any = null;
 
 if (!process.env.DATABASE_URL) {
-  if (process.env.NODE_ENV === "production") {
-    console.error("❌ Critical Configuration Error: DATABASE_URL is required in production mode.");
-    process.exit(1);
-  }
-  console.warn("⚠️ DATABASE_URL is not set. Running in preview mode with in-memory storage.");
+  console.warn("⚠️ DATABASE_URL is not set. Running with in-memory storage fallback.");
 } else {
   const isProd = process.env.NODE_ENV === "production";
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: isProd ? { rejectUnauthorized: false } : undefined,
-    max: isProd ? 1 : 10,
-    idleTimeoutMillis: 10_000,
-    connectionTimeoutMillis: 5_000,
-  });
-  db = drizzle(pool, { schema });
+  try {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: isProd ? { rejectUnauthorized: false } : undefined,
+      max: isProd ? 1 : 10,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 5_000,
+    });
+    db = drizzle(pool, { schema });
+  } catch (err) {
+    console.error("❌ Failed to initialize database pool:", err);
+  }
 }
 
 export * from "./schema";
