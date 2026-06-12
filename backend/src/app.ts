@@ -9,6 +9,7 @@ import { securityHeaders } from "./middlewares/security";
 import { rateLimiter } from "./middlewares/rateLimiter";
 import { errorHandler } from "./middlewares/errorHandler";
 import { repo } from "./db/repository";
+import { runMigrations } from "./db";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { escapeHtml, isSafeHttpUrl } from "./lib/escape";
@@ -60,6 +61,26 @@ app.use(
 );
 app.use(express.json({ limit: "64kb" }));
 app.use(express.urlencoded({ extended: true }));
+
+let migrationsRun = false;
+let migrationsPromise: Promise<void> | null = null;
+
+app.use(async (req, res, next) => {
+  if (migrationsRun || !process.env.DATABASE_URL) {
+    return next();
+  }
+  try {
+    if (!migrationsPromise) {
+      migrationsPromise = runMigrations().then(() => {
+        migrationsRun = true;
+      });
+    }
+    await migrationsPromise;
+  } catch (err) {
+    req.log?.error({ err }, "Lazy migrations failed");
+  }
+  next();
+});
 
 app.use(supabaseAuthMiddleware());
 

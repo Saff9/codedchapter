@@ -13,7 +13,7 @@ export let db: any = null;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function runMigrations() {
+export async function runMigrations() {
   if (!db) return;
   try {
     // Determine the migrations folder path relative to the runtime file
@@ -40,9 +40,6 @@ if (!process.env.DATABASE_URL) {
       connectionTimeoutMillis: 5_000,
     });
     db = drizzle(pool, { schema });
-    
-    // Run migrations asynchronously in the background so it doesn't block startup
-    runMigrations();
   } catch (err) {
     console.error("❌ Failed to initialize database pool:", err);
   }
