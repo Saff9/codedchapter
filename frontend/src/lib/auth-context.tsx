@@ -7,7 +7,10 @@ const IS_MOCK = !import.meta.env.VITE_SUPABASE_URL ||
   import.meta.env.VITE_SUPABASE_URL === "https://your-project-id.supabase.co" ||
   import.meta.env.VITE_SUPABASE_URL.includes("placeholder");
 
-const API_BASE = import.meta.env.VITE_API_URL || "/api";
+const baseEnv = import.meta.env.VITE_API_URL || "/api";
+const API_BASE = baseEnv !== "/api" && !baseEnv.endsWith("/api") && !baseEnv.endsWith("/api/")
+  ? baseEnv.replace(/\/$/, "") + "/api"
+  : baseEnv;
 
 interface AuthUser {
   id: string;

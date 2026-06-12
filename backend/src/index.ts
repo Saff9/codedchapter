@@ -1,3 +1,6 @@
+import pg from "pg";
+pg.defaults.ssl = { rejectUnauthorized: false };
+
 import app from "./app";
 import { logger } from "./lib/logger";
 

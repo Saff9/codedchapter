@@ -1,6 +1,9 @@
 import { supabase } from "./supabase";
 
-const BASE = import.meta.env.VITE_API_URL || "/api";
+const baseEnv = import.meta.env.VITE_API_URL || "/api";
+const BASE = baseEnv !== "/api" && !baseEnv.endsWith("/api") && !baseEnv.endsWith("/api/")
+  ? baseEnv.replace(/\/$/, "") + "/api"
+  : baseEnv;
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
