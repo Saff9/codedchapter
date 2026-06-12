@@ -30,11 +30,11 @@
           "value": ".*(Twitterbot|Discordbot|facebookexternalhit|WhatsApp|Googlebot|Bingbot|Slackbot).*"
         }
       ],
-      "dest": "api/index.mts"
+      "dest": "api/index.ts"
     },
     {
       "src": "/api/(.*)",
-      "dest": "api/index.mts"
+      "dest": "api/index.ts"
     },
     {
       "handle": "filesystem"

@@ -2,7 +2,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 import path from "path";
-import { fileURLToPath } from "node:url";
 import * as schema from "./schema";
 
 const { Pool } = pg;
@@ -10,8 +9,6 @@ const { Pool } = pg;
 export let pool: pg.Pool | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export let db: any = null;
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function runMigrations() {
   if (!db) return;
