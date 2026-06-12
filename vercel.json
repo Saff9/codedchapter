@@ -1,11 +1,6 @@
 {
   "version": 2,
-  "outputDirectory": "dist",
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "backend/dist/migrations/**"
-    }
-  },
+  "outputDirectory": "frontend/dist",
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -21,21 +16,6 @@
     }
   ],
   "routes": [
-    {
-      "src": "/blog/(?<id>\\d+)",
-      "has": [
-        {
-          "type": "header",
-          "key": "User-Agent",
-          "value": ".*(Twitterbot|Discordbot|facebookexternalhit|WhatsApp|Googlebot|Bingbot|Slackbot).*"
-        }
-      ],
-      "dest": "api/index.ts"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "api/index.ts"
-    },
     {
       "handle": "filesystem"
     },

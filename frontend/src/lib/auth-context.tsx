@@ -7,6 +7,8 @@ const IS_MOCK = !import.meta.env.VITE_SUPABASE_URL ||
   import.meta.env.VITE_SUPABASE_URL === "https://your-project-id.supabase.co" ||
   import.meta.env.VITE_SUPABASE_URL.includes("placeholder");
 
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
+
 interface AuthUser {
   id: string;
   email: string;
@@ -134,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Auto-create a profile in our backend database
       try {
-        await fetch("/api/profiles", {
+        await fetch(`${API_BASE}/profiles`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -175,7 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Auto-create profile in database if registration succeeded
         if (data.user) {
-          await fetch("/api/profiles", {
+          await fetch(`${API_BASE}/profiles`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

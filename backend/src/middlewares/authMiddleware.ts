@@ -57,6 +57,10 @@ export function supabaseAuthMiddleware() {
     }
 
     if (!jwtSecret) {
+      if (process.env.NODE_ENV === "production") {
+        req.log?.error("❌ SUPABASE_JWT_SECRET is missing in production! Rejecting authentication.");
+        return next();
+      }
       console.warn("⚠️ SUPABASE_JWT_SECRET is not set. Falling back to mock token validation.");
       if (token === "mock-token") {
         req.auth = {

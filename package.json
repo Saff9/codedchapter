@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r --if-present run build",
-    "vercel-build": "node vercel-build.js",
+    "vercel-build": "pnpm --filter frontend build",
     "typecheck": "pnpm -r --if-present run typecheck",
     "migrate": "pnpm --filter backend migrate"
   },
