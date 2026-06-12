@@ -31,7 +31,7 @@ if (!process.env.DATABASE_URL) {
   try {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: isProd ? { rejectUnauthorized: false } : undefined,
+      ssl: { rejectUnauthorized: false },
       max: 10,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 5_000,
