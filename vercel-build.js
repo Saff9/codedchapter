@@ -9,6 +9,9 @@ try {
     console.warn('DATABASE_URL not set — skipping migrations (preview build).');
   }
 
+  console.log('Building backend...');
+  execSync('pnpm --filter backend build', { stdio: 'inherit' });
+
   console.log('Building frontend...');
   execSync('pnpm --filter frontend build', { stdio: 'inherit' });
 
