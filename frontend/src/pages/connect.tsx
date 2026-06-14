@@ -105,7 +105,7 @@ export default function ConnectPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary blur-lg rounded-full scale-105 opacity-40 animate-pulse" />
             <div className="relative w-20 h-20 rounded-full bg-card border-2 border-primary/40 overflow-hidden flex items-center justify-center">
               <img
-                src="/favicon.jpg"
+                src="/favicon.png"
                 alt="Coded Chapter Brand Logo"
                 className="w-full h-full object-cover"
               />
