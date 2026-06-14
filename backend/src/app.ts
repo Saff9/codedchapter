@@ -13,6 +13,7 @@ import { runMigrations } from "./db";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { escapeHtml, isSafeHttpUrl } from "./lib/escape";
+import { getSubstackPosts } from "./lib/substack";
 
 const app: Express = express();
 
@@ -92,7 +93,20 @@ app.get("/blog/:id", async (req, res, next): Promise<any> => {
       return next();
     }
 
-    const post = await repo.getPost(id);
+    const feedUrl = process.env.SUBSTACK_FEED_URL || "https://codedchapter.substack.com/feed";
+    let post: any = null;
+    if (feedUrl) {
+      try {
+        const posts = await getSubstackPosts(feedUrl);
+        post = posts.find((p) => p.id === id);
+      } catch (substackErr) {
+        req.log?.warn({ err: substackErr }, "Substack post lookup failed for bot, falling back to DB");
+      }
+    }
+    if (!post) {
+      post = await repo.getPost(id);
+    }
+
     if (!post) {
       return res.status(404).send("Chapter not found");
     }
@@ -114,7 +128,8 @@ app.get("/blog/:id", async (req, res, next): Promise<any> => {
 
     const title = escapeHtml(`${post.title} | Coded Chapter`);
     const desc = escapeHtml(post.excerpt || "Read this chapter of my coding journey.");
-    const url = escapeHtml(`${req.protocol}://${req.get("host")}/blog/${post.id}`);
+    const frontendUrl = process.env.FRONTEND_URL || "https://codedchapter.vercel.app";
+    const url = escapeHtml(`${frontendUrl}/blog/${post.id}`);
     const image = post.coverImage && isSafeHttpUrl(post.coverImage) ? escapeHtml(post.coverImage) : "";
 
     html = html

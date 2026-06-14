@@ -193,4 +193,57 @@ router.post("/", async (req, res): Promise<any> => {
   }
 });
 
+router.get("/sitemap.xml", cachePublic(300), async (req: any, res: any) => {
+  try {
+    const feedUrl = process.env.SUBSTACK_FEED_URL || "https://codedchapter.substack.com/feed";
+    let posts: any[] = [];
+    if (feedUrl) {
+      try {
+        posts = await getSubstackPosts(feedUrl);
+      } catch (substackErr) {
+        req.log.warn({ err: substackErr }, "Substack sitemap integration failed, falling back to database");
+        posts = await repo.listPosts();
+      }
+    } else {
+      posts = await repo.listPosts();
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || "https://codedchapter.vercel.app";
+
+    const urls = [
+      { loc: `${frontendUrl}/`, changefreq: "daily", priority: "1.0" },
+      { loc: `${frontendUrl}/tech`, changefreq: "daily", priority: "0.8" },
+      { loc: `${frontendUrl}/general`, changefreq: "daily", priority: "0.8" },
+      { loc: `${frontendUrl}/doubts`, changefreq: "daily", priority: "0.8" },
+      { loc: `${frontendUrl}/about`, changefreq: "monthly", priority: "0.7" },
+      { loc: `${frontendUrl}/connect`, changefreq: "monthly", priority: "0.6" },
+      ...posts.map((post) => ({
+        loc: `${frontendUrl}/blog/${post.id}`,
+        changefreq: "weekly",
+        priority: "0.7",
+        lastmod: post.updatedAt ? new Date(post.updatedAt).toISOString().split("T")[0] : undefined,
+      })),
+    ];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+    for (const url of urls) {
+      xml += "  <url>\n";
+      xml += `    <loc>${url.loc}</loc>\n`;
+      xml += `    <changefreq>${url.changefreq}</changefreq>\n`;
+      xml += `    <priority>${url.priority}</priority>\n`;
+      if (url.lastmod) {
+        xml += `    <lastmod>${url.lastmod}</lastmod>\n`;
+      }
+      xml += "  </url>\n";
+    }
+    xml += "</urlset>\n";
+
+    res.header("Content-Type", "application/xml");
+    return res.send(xml);
+  } catch (err) {
+    req.log.error({ err }, "Failed to generate sitemap");
+    return res.status(500).send("Internal server error");
+  }
+});
+
 export default router;

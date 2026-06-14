@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { useLocation, useSearch } from "wouter";
 import { PostCard } from "@/components/post-card";
 import { Hash, Search, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { updateMetaTags } from "@/lib/utils";
 
 export default function GeneralLogs() {
   const searchString = useSearch();
@@ -12,9 +14,17 @@ export default function GeneralLogs() {
   const searchQuery = searchParams.get("search") || "";
   const [location, setLocation] = useLocation();
 
+  useEffect(() => {
+    updateMetaTags({
+      title: "General Journals | Coded Chapter",
+      description: "Personal thoughts, learning updates, J&K BOSE details, and college plans.",
+      canonicalUrl: "https://codedchapter.vercel.app/general",
+    });
+  }, []);
+
   const { data: posts, isLoading, error } = useQuery({
-    queryKey: ["/api/posts", "general", tagParam],
-    queryFn: () => api.listPosts("general", tagParam || undefined),
+    queryKey: ["/api/posts", tagParam],
+    queryFn: () => api.listPosts(undefined, tagParam || undefined),
   });
 
   const { data: tags } = useQuery({
@@ -69,6 +79,13 @@ export default function GeneralLogs() {
                   )}
                 </h1>
                 <p className="text-xs text-muted-foreground mt-1">Personal thoughts, learning updates, J&K BOSE details, and college plans.</p>
+                <div className="mt-3 p-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] text-primary flex items-center gap-2 max-w-fit">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
+                  </span>
+                  <span>All chapters are pulled directly from Substack.</span>
+                </div>
               </div>
 
               {/* Search box */}

@@ -130,13 +130,37 @@ export function updateMetaTags(meta: {
     tag.setAttribute('content', content);
   };
 
+  // Helper to update or insert name-based meta tags (like Twitter)
+  const setMetaName = (name: string, content: string) => {
+    let tag = document.querySelector(`meta[name="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', name);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  };
+
   setMetaProperty("og:title", meta.title);
   setMetaProperty("og:description", meta.description);
   setMetaProperty("og:type", meta.ogType || "website");
+  
+  setMetaName("twitter:title", meta.title);
+  setMetaName("twitter:description", meta.description);
+  setMetaName("twitter:card", "summary_large_image");
+
   if (meta.canonicalUrl) {
     setMetaProperty("og:url", meta.canonicalUrl);
+    setMetaName("twitter:url", meta.canonicalUrl);
   }
+
   if (meta.ogImage) {
-    setMetaProperty("og:image", meta.ogImage);
+    let absoluteImage = meta.ogImage;
+    if (absoluteImage.startsWith("/")) {
+      const frontendUrl = "https://codedchapter.vercel.app";
+      absoluteImage = `${frontendUrl}${absoluteImage}`;
+    }
+    setMetaProperty("og:image", absoluteImage);
+    setMetaName("twitter:image", absoluteImage);
   }
 }
