@@ -47,7 +47,7 @@ router.get("/", cachePublic(60), async (req, res) => {
   }
 });
 
-router.get("/featured", cachePublic(120), async (req, res) => {
+router.get("/featured", cachePublic(120), async (req, res): Promise<any> => {
   try {
     const feedUrl = process.env.SUBSTACK_FEED_URL || "https://codedchapter.substack.com/feed";
     if (feedUrl) {
@@ -59,10 +59,10 @@ router.get("/featured", cachePublic(120), async (req, res) => {
       }
     }
     const posts = await repo.getFeaturedPosts();
-    res.json(posts);
+    return res.json(posts);
   } catch (err: any) {
     req.log.error({ err }, "Failed to get featured posts");
-    res.status(500).json({
+    return res.status(500).json({
       error: "Internal server error",
       message: err?.message || String(err),
       stack: err?.stack,
@@ -70,7 +70,7 @@ router.get("/featured", cachePublic(120), async (req, res) => {
   }
 });
 
-router.get("/tags", cachePublic(300), async (req, res) => {
+router.get("/tags", cachePublic(300), async (req, res): Promise<any> => {
   try {
     const feedUrl = process.env.SUBSTACK_FEED_URL || "https://codedchapter.substack.com/feed";
     if (feedUrl) {
@@ -84,10 +84,10 @@ router.get("/tags", cachePublic(300), async (req, res) => {
       }
     }
     const tags = await repo.getAllTags();
-    res.json(tags);
+    return res.json(tags);
   } catch (err: any) {
     req.log.error({ err }, "Failed to get tags");
-    res.status(500).json({
+    return res.status(500).json({
       error: "Internal server error",
       message: err?.message || String(err),
       stack: err?.stack,
@@ -193,7 +193,14 @@ router.post("/", async (req, res): Promise<any> => {
   }
 });
 
-router.get("/sitemap.xml", cachePublic(300), async (req: any, res: any) => {
+interface SitemapUrl {
+  loc: string;
+  changefreq: string;
+  priority: string;
+  lastmod?: string;
+}
+
+router.get("/sitemap.xml", cachePublic(300), async (req: any, res: any): Promise<any> => {
   try {
     const feedUrl = process.env.SUBSTACK_FEED_URL || "https://codedchapter.substack.com/feed";
     let posts: any[] = [];
@@ -210,7 +217,7 @@ router.get("/sitemap.xml", cachePublic(300), async (req: any, res: any) => {
 
     const frontendUrl = process.env.FRONTEND_URL || "https://codedchapter.vercel.app";
 
-    const urls = [
+    const urls: SitemapUrl[] = [
       { loc: `${frontendUrl}/`, changefreq: "daily", priority: "1.0" },
       { loc: `${frontendUrl}/tech`, changefreq: "daily", priority: "0.8" },
       { loc: `${frontendUrl}/general`, changefreq: "daily", priority: "0.8" },

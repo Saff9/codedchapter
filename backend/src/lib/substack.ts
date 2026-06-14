@@ -154,7 +154,7 @@ export async function fetchSubstackPosts(feedUrl: string): Promise<SubstackPost[
         commentCount: 0,
         isHtml: true,
         substackUrl: link || undefined,
-      } satisfies SubstackPost;
+      } as SubstackPost;
     })
     .filter((p): p is SubstackPost => p !== null);
 }
