@@ -1,6 +1,6 @@
 # Coded Chapter
 
-Personal dev log + Q&A board. I built this to write down what I'm learning — from finishing 10th/12th under J&K BOSE to picking up Python, web dev, and whatever comes next in college.
+Personal dev log + Q&A board. I built this to write down what I'm learning — from picking up Python, web dev, and whatever comes next in college.
 
 Stack: React 19 + Vite frontend, Express 5 + Drizzle + Postgres backend. Deploys on Vercel.
 

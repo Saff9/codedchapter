@@ -274,7 +274,6 @@ export default function AboutPage() {
                   <h3 className="text-sm font-semibold text-foreground">12th Grade (Higher Secondary)</h3>
                   <span className="text-[10px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-full">2026</span>
                 </div>
-                <p className="text-xs text-muted-foreground">J&K State Board of School Education (JKBOSE)</p>
                 <p className="text-[11px] text-muted-foreground/80">Completed higher secondary education, laying the theoretical base prior to university.</p>
               </div>
             </div>
@@ -288,7 +287,6 @@ export default function AboutPage() {
                   <h3 className="text-sm font-semibold text-foreground">11th Grade</h3>
                   <span className="text-[10px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">2025</span>
                 </div>
-                <p className="text-xs text-muted-foreground">J&K State Board of School Education (JKBOSE)</p>
               </div>
             </div>
 
@@ -301,7 +299,6 @@ export default function AboutPage() {
                   <h3 className="text-sm font-semibold text-foreground">10th Grade (Secondary School)</h3>
                   <span className="text-[10px] font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-full">2024</span>
                 </div>
-                <p className="text-xs text-muted-foreground">J&K State Board of School Education (JKBOSE)</p>
                 <p className="text-[11px] text-muted-foreground/80">Cleared Secondary School Examination with a strong foundation in science and mathematics.</p>
               </div>
             </div>

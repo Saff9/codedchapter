@@ -50,7 +50,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
-              My dev log — notes from learning to code while finishing school under J&amp;K BOSE. Bugs, fixes, and whatever I figured out that week.
+              My dev log — notes from learning to code. Bugs, fixes, and whatever I figured out that week.
             </p>
             <div className="pt-2">
               <a

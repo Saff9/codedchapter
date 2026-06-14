@@ -17,7 +17,7 @@ export default function GeneralLogs() {
   useEffect(() => {
     updateMetaTags({
       title: "General Journals | Coded Chapter",
-      description: "Personal thoughts, learning updates, J&K BOSE details, and college plans.",
+      description: "Personal thoughts, learning updates, and college plans.",
       canonicalUrl: "https://codedchapter.vercel.app/general",
     });
   }, []);
@@ -78,7 +78,7 @@ export default function GeneralLogs() {
                     "General Journals"
                   )}
                 </h1>
-                <p className="text-xs text-muted-foreground mt-1">Personal thoughts, learning updates, J&K BOSE details, and college plans.</p>
+                <p className="text-xs text-muted-foreground mt-1">Personal thoughts, learning updates, and college plans.</p>
                 <div className="mt-3 p-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] text-primary flex items-center gap-2 max-w-fit">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
