@@ -20,6 +20,27 @@ export async function runMigrations() {
     console.log("⚡ Running automatic database migrations at startup from:", migrationsFolder);
     await migrate(db, { migrationsFolder });
     console.log("✅ Database migrations completed successfully!");
+
+    // Purge old mock/placeholder data from the live database
+    try {
+      const { sql } = await import("drizzle-orm");
+      console.log("⚡ Cleaning up default placeholders/mock comments and doubts...");
+      await db.delete(schema.commentsTable).where(
+        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
+      );
+      await db.delete(schema.doubtsTable).where(
+        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
+      );
+      await db.delete(schema.doubtAnswersTable).where(
+        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
+      );
+      await db.delete(schema.postsTable).where(
+        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
+      );
+      console.log("✅ Placeholder cleanup completed successfully!");
+    } catch (cleanupErr) {
+      console.error("⚠️ Failed to clean up database placeholders:", cleanupErr);
+    }
   } catch (err) {
     console.error("❌ Failed to run database migrations at startup:", err);
   }
