@@ -1,74 +1,9 @@
 import { motion } from "framer-motion";
-import { FaGithub, FaYoutube, FaTelegram, FaDiscord, FaHeart } from "react-icons/fa6";
-import { SiSubstack } from "react-icons/si";
 import { ArrowUpRight } from "lucide-react";
+import { getConnectSocials } from "@/lib/social-links";
 
-interface SocialLink {
-  name: string;
-  url: string;
-  icon: React.ReactNode;
-  gradient: string;
-  borderColor: string;
-  shadowColor: string;
-  description: string;
-}
+const SOCIAL_LINKS = getConnectSocials();
 
-const SOCIAL_LINKS: SocialLink[] = [
-  {
-    name: "GitHub",
-    url: "https://github.com/codedchapter",
-    icon: <FaGithub className="w-5 h-5" />,
-    gradient: "from-zinc-900 to-zinc-800",
-    borderColor: "border-zinc-700/50",
-    shadowColor: "shadow-zinc-500/10",
-    description: "Browse the source code, open issues, or contribute to my learning projects.",
-  },
-  {
-    name: "YouTube",
-    url: "https://www.youtube.com/@CodedChapter",
-    icon: <FaYoutube className="w-5 h-5 text-red-500" />,
-    gradient: "from-rose-950/80 to-rose-900/50",
-    borderColor: "border-red-500/30",
-    shadowColor: "shadow-red-600/10",
-    description: "Watch coding tutorials, debugging logs, and learning recaps.",
-  },
-  {
-    name: "Telegram Channel",
-    url: "https://t.me/CodedChapter",
-    icon: <FaTelegram className="w-5 h-5 text-[#26A5E4]" />,
-    gradient: "from-sky-950/80 to-sky-900/50",
-    borderColor: "border-sky-500/30",
-    shadowColor: "shadow-sky-500/10",
-    description: "Join the channel for real-time code updates, links, and discussions.",
-  },
-  {
-    name: "Discord Server",
-    url: "https://discord.gg/5zwAUuD4Ec",
-    icon: <FaDiscord className="w-5 h-5 text-[#5865F2]" />,
-    gradient: "from-indigo-950/80 to-indigo-900/50",
-    borderColor: "border-indigo-500/30",
-    shadowColor: "shadow-indigo-500/10",
-    description: "Join our peer learning group. Chat about bugs, review code, or build together.",
-  },
-  {
-    name: "Substack Newsletter",
-    url: import.meta.env.VITE_SUBSTACK_URL || "https://codedchapter.substack.com/",
-    icon: <SiSubstack className="w-5 h-5 text-[#FF6719]" />,
-    gradient: "from-amber-950/80 to-amber-900/50",
-    borderColor: "border-amber-500/30",
-    shadowColor: "shadow-amber-500/10",
-    description: "Subscribe to read detailed logs and retrospectives on my coding journey.",
-  },
-  {
-    name: "Support Coded Chapter (₹199)",
-    url: "https://razorpay.me/@CodeChap?amount=KxK8ikz%2BGFZ8lMDydVeeuA%3D%3D",
-    icon: <FaHeart className="w-5 h-5 text-rose-500 fill-rose-500 animate-pulse" />,
-    gradient: "from-rose-950/80 to-amber-950/60",
-    borderColor: "border-rose-500/35",
-    shadowColor: "shadow-rose-600/15",
-    description: "Support my self-taught dev journey by contributing ₹199 securely via Razorpay.",
-  },
-];
 
 export default function ConnectPage() {
   const containerVariants = {

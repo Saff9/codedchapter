@@ -32,11 +32,7 @@ router.get("/", cachePublic(60), async (req, res): Promise<any> => {
     }
   } catch (err: any) {
     req.log.error({ err }, "Failed to list posts");
-    return res.status(500).json({
-      error: "Internal server error",
-      message: err?.message || String(err),
-      stack: err?.stack,
-    });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -52,11 +48,7 @@ router.get("/featured", cachePublic(120), async (req, res): Promise<any> => {
     }
   } catch (err: any) {
     req.log.error({ err }, "Failed to get featured posts");
-    return res.status(500).json({
-      error: "Internal server error",
-      message: err?.message || String(err),
-      stack: err?.stack,
-    });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -74,11 +66,7 @@ router.get("/tags", cachePublic(300), async (req, res): Promise<any> => {
     }
   } catch (err: any) {
     req.log.error({ err }, "Failed to get tags");
-    return res.status(500).json({
-      error: "Internal server error",
-      message: err?.message || String(err),
-      stack: err?.stack,
-    });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 

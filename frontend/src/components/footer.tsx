@@ -4,8 +4,8 @@ import { useAuth } from "@/lib/auth-context";
 import { isAdminEmail } from "@/lib/admin";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Send, Loader2 } from "lucide-react";
-import { FaGithub, FaYoutube, FaTelegram, FaDiscord } from "react-icons/fa6";
 import { SiSubstack } from "react-icons/si";
+import { getFooterSocials, SUBSTACK_URL, RAZORPAY_URL } from "@/lib/social-links";
 
 export function Footer() {
   const { user } = useAuth();
@@ -13,14 +13,13 @@ export function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const { toast } = useToast();
-  
-  const SUBSTACK_URL = import.meta.env.VITE_SUBSTACK_URL || "https://codedchapter.substack.com";
+
+  const footerSocials = getFooterSocials();
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
     
-    // Open Substack subscribe page with pre-filled email in new tab
     const url = `${SUBSTACK_URL.replace(/\/$/, "")}/subscribe?email=${encodeURIComponent(email)}`;
     window.open(url, "_blank");
     
@@ -54,7 +53,7 @@ export function Footer() {
             </p>
             <div className="pt-2">
               <a
-                href="https://razorpay.me/@CodeChap?amount=KxK8ikz%2BGFZ8lMDydVeeuA%3D%3D"
+                href={RAZORPAY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/10 text-[10px] font-semibold text-rose-400 transition-all shadow-sm hover:scale-[1.02]"
@@ -135,21 +134,18 @@ export function Footer() {
           
           {/* Social Icons */}
           <div className="flex items-center gap-4">
-            <a href="https://github.com/codedchapter" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer" aria-label="GitHub">
-              <FaGithub className="w-4 h-4" />
-            </a>
-            <a href="https://www.youtube.com/@CodedChapter" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer" aria-label="YouTube">
-              <FaYoutube className="w-4 h-4" />
-            </a>
-            <a href="https://t.me/CodedChapter" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer" aria-label="Telegram">
-              <FaTelegram className="w-4 h-4" />
-            </a>
-            <a href="https://discord.gg/5zwAUuD4Ec" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer" aria-label="Discord">
-              <FaDiscord className="w-4 h-4" />
-            </a>
-            <a href={SUBSTACK_URL} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center" aria-label="Substack">
-              <SiSubstack className="w-3.5 h-3.5" />
-            </a>
+            {footerSocials.map((social) => (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label={social.label}
+              >
+                <social.icon className={social.name === "Substack" ? "w-3.5 h-3.5" : "w-4 h-4"} />
+              </a>
+            ))}
           </div>
         </div>
       </div>

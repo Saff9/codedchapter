@@ -7,9 +7,13 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
 
   if (res.headersSent) return;
 
+  const isProd = process.env.NODE_ENV === "production";
+
   res.status(500).json({
     error: "Internal server error",
-    message: err instanceof Error ? err.message : String(err),
-    stack: err instanceof Error ? err.stack : undefined,
+    ...(isProd ? {} : {
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+    }),
   });
 }

@@ -35,13 +35,12 @@ export interface IRepository {
 
 // ── postgres implementation ───────────────────────────────────────────────
 class PostgresRepository implements IRepository {
-  async getProfileByUserId(userId: string) {
-    const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.userId, userId));
-    if (!profile) return null;
-
-    const [postsCountRes] = await db.select({ count: sql<number>`count(*)` }).from(postsTable).where(eq(postsTable.authorId, userId));
-    const [doubtsCountRes] = await db.select({ count: sql<number>`count(*)` }).from(doubtsTable).where(eq(doubtsTable.authorId, userId));
-    const [answersCountRes] = await db.select({ count: sql<number>`count(*)` }).from(doubtAnswersTable).where(eq(doubtAnswersTable.authorId, userId));
+  private async enrichProfileWithCounts(profile: typeof profilesTable.$inferSelect) {
+    const [[postsCountRes], [doubtsCountRes], [answersCountRes]] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(postsTable).where(eq(postsTable.authorId, profile.userId)),
+      db.select({ count: sql<number>`count(*)` }).from(doubtsTable).where(eq(doubtsTable.authorId, profile.userId)),
+      db.select({ count: sql<number>`count(*)` }).from(doubtAnswersTable).where(eq(doubtAnswersTable.authorId, profile.userId)),
+    ]);
 
     return {
       ...profile,
@@ -51,20 +50,16 @@ class PostgresRepository implements IRepository {
     };
   }
 
+  async getProfileByUserId(userId: string) {
+    const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.userId, userId));
+    if (!profile) return null;
+    return this.enrichProfileWithCounts(profile);
+  }
+
   async getProfileByUsername(username: string) {
     const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.username, username.toLowerCase()));
     if (!profile) return null;
-
-    const [postsCountRes] = await db.select({ count: sql<number>`count(*)` }).from(postsTable).where(eq(postsTable.authorId, profile.userId));
-    const [doubtsCountRes] = await db.select({ count: sql<number>`count(*)` }).from(doubtsTable).where(eq(doubtsTable.authorId, profile.userId));
-    const [answersCountRes] = await db.select({ count: sql<number>`count(*)` }).from(doubtAnswersTable).where(eq(doubtAnswersTable.authorId, profile.userId));
-
-    return {
-      ...profile,
-      postsCount: Number(postsCountRes?.count ?? 0),
-      doubtsCount: Number(doubtsCountRes?.count ?? 0),
-      answersCount: Number(answersCountRes?.count ?? 0),
-    };
+    return this.enrichProfileWithCounts(profile);
   }
 
   async checkUsernameAvailable(username: string) {
@@ -395,22 +390,24 @@ class PostgresRepository implements IRepository {
   }
 
   async acceptAnswer(doubtId: number, answerId: number, userId: string) {
-    const [doubt] = await db.select().from(doubtsTable).where(eq(doubtsTable.id, doubtId));
-    if (!doubt) throw new Error("Doubt not found");
-    if (doubt.authorId !== userId) throw new Error("Forbidden");
+    return db.transaction(async (tx: any) => {
+      const [doubt] = await tx.select().from(doubtsTable).where(eq(doubtsTable.id, doubtId));
+      if (!doubt) throw new Error("Doubt not found");
+      if (doubt.authorId !== userId) throw new Error("Forbidden");
 
-    const [target] = await db.select().from(doubtAnswersTable).where(eq(doubtAnswersTable.id, answerId));
-    if (!target || target.doubtId !== doubtId) throw new Error("Answer not found");
+      const [target] = await tx.select().from(doubtAnswersTable).where(eq(doubtAnswersTable.id, answerId));
+      if (!target || target.doubtId !== doubtId) throw new Error("Answer not found");
 
-    await db.update(doubtAnswersTable).set({ isAccepted: false }).where(eq(doubtAnswersTable.doubtId, doubtId));
-    const [answer] = await db
-      .update(doubtAnswersTable)
-      .set({ isAccepted: true })
-      .where(eq(doubtAnswersTable.id, answerId))
-      .returning();
-    await db.update(doubtsTable).set({ isResolved: true, updatedAt: new Date() }).where(eq(doubtsTable.id, doubtId));
+      await tx.update(doubtAnswersTable).set({ isAccepted: false }).where(eq(doubtAnswersTable.doubtId, doubtId));
+      const [answer] = await tx
+        .update(doubtAnswersTable)
+        .set({ isAccepted: true })
+        .where(eq(doubtAnswersTable.id, answerId))
+        .returning();
+      await tx.update(doubtsTable).set({ isResolved: true, updatedAt: new Date() }).where(eq(doubtsTable.id, doubtId));
 
-    return answer;
+      return answer;
+    });
   }
 }
 

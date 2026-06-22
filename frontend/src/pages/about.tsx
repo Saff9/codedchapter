@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
-import { FaGithub, FaYoutube, FaTelegram, FaDiscord, FaJava } from "react-icons/fa6";
+import { FaJava } from "react-icons/fa6";
 import { Mail, MapPin, Calendar, Code, Heart, Trophy, BookOpen, Terminal, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
 import { 
   SiJavascript, 
@@ -10,26 +10,14 @@ import {
   SiPostgresql, 
   SiSupabase, 
   SiGit,
-  SiSubstack,
   SiNodedotjs,
   SiPython,
   SiCplusplus
 } from "react-icons/si";
+import { FaGithub } from "react-icons/fa6";
+import { getAboutSocials } from "@/lib/social-links";
 
-interface SocialLink {
-  name: string;
-  url: string;
-  icon: React.ReactNode;
-  color: string;
-}
-
-const SOCIALS: SocialLink[] = [
-  { name: "GitHub", url: "https://github.com/codedchapter", icon: <FaGithub className="w-4 h-4" />, color: "hover:text-primary hover:border-primary/40" },
-  { name: "YouTube", url: "https://www.youtube.com/@CodedChapter", icon: <FaYoutube className="w-4 h-4 text-red-500" />, color: "hover:text-red-400 hover:border-red-400/40" },
-  { name: "Telegram", url: "https://t.me/CodedChapter", icon: <FaTelegram className="w-4 h-4 text-[#26A5E4]" />, color: "hover:text-[#26A5E4] hover:border-[#26A5E4]/40" },
-  { name: "Discord", url: "https://discord.gg/5zwAUuD4Ec", icon: <FaDiscord className="w-4 h-4 text-[#5865F2]" />, color: "hover:text-[#5865F2] hover:border-[#5865F2]/40" },
-  { name: "Substack", url: import.meta.env.VITE_SUBSTACK_URL || "https://codedchapter.substack.com/", icon: <SiSubstack className="w-4 h-4 text-[#FF6719]" />, color: "hover:text-[#FF6719] hover:border-[#FF6719]/40" },
-];
+const SOCIALS = getAboutSocials();
 
 const SKILLS = [
   { name: "Python (CS50P)", level: "Active Learning", category: "Languages", icon: <SiPython className="w-4 h-4 text-[#3776AB]" /> },

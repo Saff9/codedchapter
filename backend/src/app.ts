@@ -52,7 +52,7 @@ app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      if (!origin || allowedOrigins.includes(origin) || origin === "https://codedchapter.vercel.app") {
         callback(null, true);
       } else {
         callback(null, false);
