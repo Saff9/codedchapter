@@ -157,3 +157,48 @@
 .tag-blue { @apply bg-blue-500/10 text-blue-400 border-blue-500/20; }
 .tag-rose { @apply bg-rose-500/10 text-rose-400 border-rose-500/20; }
 .tag-cyan { @apply bg-cyan-500/10 text-cyan-400 border-cyan-500/20; }
+
+/* ── Screen Capture Protection ────────────────────────────────────────────────
+   @media print fires before Ctrl+P, Print Screen (on some systems), and PDF export.
+   Hiding all content makes the printed page / screenshot appear blank.
+   The ::after pseudo-element shows a branded watermark message in its place.
+*/
+@media print {
+  body > * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  body::after {
+    content: "© Coded Chapter — Content protected. Visit codedchapter.vercel.app";
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    color: #444;
+    font-family: monospace;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+/* ── Disable text selection on protected content areas ────────────────────── */
+.protected-content {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Allow selection on interactive elements */
+.protected-content input,
+.protected-content textarea,
+.protected-content [contenteditable] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+

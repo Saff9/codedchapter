@@ -1,0 +1,40 @@
+# ── Core ───────────────────────────────────────────────────
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+gunicorn==23.0.0
+
+# ── Validation & Config ────────────────────────────────────
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# ── HTTP Client (for Substack RSS fetch) ──────────────────
+httpx==0.28.1
+
+# ── Database (async PostgreSQL via SQLAlchemy) ────────────
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+
+# ── Authentication (Supabase JWT validation) ───────────────
+python-jose[cryptography]==3.3.0
+cryptography==43.0.3
+
+# ── Rate Limiting ──────────────────────────────────────────
+slowapi==0.1.9
+limits==3.13.0
+
+# ── Caching ───────────────────────────────────────────────
+cachetools==5.5.0
+
+# ── RSS / XML Parsing ─────────────────────────────────────
+feedparser==6.0.11
+
+# ── CORS / Middleware ─────────────────────────────────────
+python-multipart==0.0.19
+starlette==0.41.3
+
+# ── Logging ───────────────────────────────────────────────
+structlog==24.4.0
+
+# ── Security ──────────────────────────────────────────────
+itsdangerous==2.2.0

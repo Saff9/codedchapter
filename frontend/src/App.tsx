@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { Layout } from "./components/layout";
 import { AuthProvider } from "./lib/auth-context";
+import { ScreenGuard } from "./components/screen-guard";
 
 // Lazy loaded page components
 const Home = lazy(() => import("./pages/home"));
@@ -112,10 +113,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <Layout>
-            <AppRoutes />
-          </Layout>
-          <Toaster />
+          {/* ScreenGuard: black overlay on focus-loss/print/screen-record events */}
+          <ScreenGuard>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+            <Toaster />
+          </ScreenGuard>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
