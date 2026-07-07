@@ -58,7 +58,7 @@ export default function SignUpPage() {
                 Registration Opening Soon
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Community accounts are in closed beta. Subscribe to my Substack to get all dev logs delivered straight to your inbox — and be first in line when signups open.
+                Community accounts are in closed beta. Subscribe to my Substack to get all dev logs delivered straight to your inbox. You will also be first in line when signups open.
               </p>
             </div>
 

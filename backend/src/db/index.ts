@@ -3,6 +3,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 import path from "path";
 import * as schema from "./schema";
+import { logger } from "../lib/logger";
 
 const { Pool } = pg;
 pg.defaults.ssl = { rejectUnauthorized: false };
@@ -14,42 +15,36 @@ export let db: any = null;
 export async function runMigrations() {
   if (!db) return;
   try {
-    // Determine the migrations folder path relative to the runtime file
-    // The bundled file is at backend/dist/app.mjs, and the migrations folder is copied to backend/dist/migrations
+    // The bundled file lands at backend/dist/app.mjs; migrations folder is copied alongside it.
     const migrationsFolder = path.resolve(__dirname, "migrations");
-    console.log("⚡ Running automatic database migrations at startup from:", migrationsFolder);
+    logger.info({ migrationsFolder }, "Running database migrations");
     await migrate(db, { migrationsFolder });
-    console.log("✅ Database migrations completed successfully!");
+    logger.info("Database migrations completed");
 
-    // Purge old mock/placeholder data from the live database
+    // Clean up any mock/placeholder rows that were seeded during local development.
+    // These author IDs only ever exist in dev and should never reach the live database,
+    // but we purge them on startup just in case.
     try {
       const { sql } = await import("drizzle-orm");
-      console.log("⚡ Cleaning up default placeholders/mock comments and doubts...");
-      await db.delete(schema.commentsTable).where(
-        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
-      );
-      await db.delete(schema.doubtsTable).where(
-        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
-      );
-      await db.delete(schema.doubtAnswersTable).where(
-        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
-      );
-      await db.delete(schema.postsTable).where(
-        sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`
-      );
-      console.log("✅ Placeholder cleanup completed successfully!");
+      const mockIds = sql`author_id IN ('mock-user-123', 'senior-architect-id', 'other-coder-id', '1')`;
+
+      await db.delete(schema.commentsTable).where(mockIds);
+      await db.delete(schema.doubtsTable).where(mockIds);
+      await db.delete(schema.doubtAnswersTable).where(mockIds);
+      await db.delete(schema.postsTable).where(mockIds);
+
+      logger.info("Placeholder cleanup completed");
     } catch (cleanupErr) {
-      console.error("⚠️ Failed to clean up database placeholders:", cleanupErr);
+      logger.warn({ err: cleanupErr }, "Failed to clean up placeholder rows — not fatal");
     }
   } catch (err) {
-    console.error("❌ Failed to run database migrations at startup:", err);
+    logger.error({ err }, "Database migrations failed at startup");
   }
 }
 
 if (!process.env.DATABASE_URL) {
-  console.warn("⚠️ DATABASE_URL is not set. Running with in-memory storage fallback.");
+  logger.warn("DATABASE_URL is not set — running with in-memory storage fallback");
 } else {
-  const isProd = process.env.NODE_ENV === "production";
   try {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
@@ -60,7 +55,7 @@ if (!process.env.DATABASE_URL) {
     });
     db = drizzle(pool, { schema });
   } catch (err) {
-    console.error("❌ Failed to initialize database pool:", err);
+    logger.error({ err }, "Failed to initialize database pool");
   }
 }
 

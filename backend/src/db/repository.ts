@@ -1,6 +1,8 @@
 import { db } from "./index";
 import { profilesTable, postsTable, commentsTable, doubtsTable, doubtAnswersTable } from "./schema";
 import { eq, desc, sql, and } from "drizzle-orm";
+import { logger } from "../lib/logger";
+
 
 export interface IRepository {
   // Profiles
@@ -759,11 +761,11 @@ class ResilientRepository implements IRepository {
       try {
         this.pgRepo = new PostgresRepository();
       } catch (err) {
-        console.error("Failed to initialize PostgresRepository, falling back to in-memory:", err);
+        logger.error({ err }, "Failed to initialize PostgresRepository — falling back to in-memory");
         this.useInMemory = true;
       }
     } else {
-      console.warn("DATABASE_URL is not set. Using in-memory repository.");
+      logger.warn("DATABASE_URL is not set — using in-memory repository");
       this.useInMemory = true;
     }
   }
@@ -775,7 +777,7 @@ class ResilientRepository implements IRepository {
     try {
       return await op(this.pgRepo);
     } catch (err) {
-      console.error("Database operation failed. Falling back to in-memory repository:", err);
+      logger.error({ err }, "Database operation failed — falling back to in-memory repository");
       this.useInMemory = true;
       return op(this.inMemoryRepo);
     }

@@ -33,23 +33,28 @@ export default function ConnectPage() {
 
         {/* ── Profile Header ───────────────────────────────────────── */}
         <div className="text-center space-y-5">
-          {/* Avatar with glow ring */}
+          {/* Avatar */}
           <motion.div
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="relative inline-flex mx-auto"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary blur-2xl rounded-full scale-110 opacity-30 animate-pulse" />
-            <div className="relative w-24 h-24 rounded-full bg-card border-2 border-primary/40 overflow-hidden flex items-center justify-center shadow-2xl shadow-primary/20">
+            {/* Soft glow ring — positioned OUTSIDE the avatar so it never blurs the image */}
+            <div className="absolute -inset-3 bg-gradient-to-br from-primary to-secondary blur-xl rounded-full opacity-20 animate-pulse pointer-events-none" />
+
+            {/* Avatar circle — clean, no blur applied here */}
+            <div className="relative w-24 h-24 rounded-full bg-card border-2 border-primary/40 overflow-hidden flex items-center justify-center shadow-2xl shadow-primary/10 z-10">
               <img
                 src="/favicon.png"
-                alt="Coded Chapter"
+                alt="Coded Chapter logo"
                 className="w-full h-full object-cover"
+                loading="eager"
               />
             </div>
+
             {/* Online indicator */}
-            <div className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-background shadow-sm shadow-emerald-500/50" />
+            <div className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-background shadow-sm shadow-emerald-500/50 z-20" />
           </motion.div>
 
           <div className="space-y-2">
@@ -74,7 +79,7 @@ export default function ConnectPage() {
               transition={{ delay: 0.25 }}
               className="text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed"
             >
-              Sharing my raw coding journey — failures, breakthroughs, and everything in between. Connect across my channels!
+              Sharing my raw coding journey. Failures, breakthroughs, and everything in between. Connect across my channels!
             </motion.p>
           </div>
         </div>

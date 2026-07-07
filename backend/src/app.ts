@@ -52,7 +52,10 @@ app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || origin === "https://codedchapter.vercel.app") {
+      // Allow requests with no origin (same-origin, curl, mobile apps)
+      // and any origin that is in the allowedOrigins list.
+      // In production, FRONTEND_URL must be set correctly or cross-origin requests will be rejected.
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(null, false);

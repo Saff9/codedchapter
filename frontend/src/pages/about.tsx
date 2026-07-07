@@ -2,41 +2,52 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { FaJava } from "react-icons/fa6";
-import { Mail, MapPin, Calendar, Code, Heart, Trophy, BookOpen, Terminal, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
-import { 
-  SiJavascript, 
-  SiReact, 
-  SiTailwindcss, 
-  SiPostgresql, 
-  SiSupabase, 
+import { MapPin, Calendar, Code, Heart, Trophy, BookOpen, Terminal, GraduationCap, ChevronLeft, ChevronRight, Monitor } from "lucide-react";
+import {
+  SiJavascript,
+  SiReact,
+  SiTailwindcss,
+  SiPostgresql,
   SiGit,
   SiNodedotjs,
   SiPython,
-  SiCplusplus
+  SiCplusplus,
+  SiLinux,
 } from "react-icons/si";
 import { FaGithub } from "react-icons/fa6";
 import { getAboutSocials } from "@/lib/social-links";
 
 const SOCIALS = getAboutSocials();
 
+// Current tech stack. Update the `level` field as you progress:
+//   "Active Learning" → currently studying this right now
+//   "Upcoming"        → planned but not started yet
+//   "Completed"       → finished a course or feel confident in it
 const SKILLS = [
-  { name: "Python (CS50P)", level: "Active Learning", category: "Languages", icon: <SiPython className="w-4 h-4 text-[#3776AB]" /> },
-  { name: "Git & Version Control", level: "Active Learning", category: "Tools", icon: <SiGit className="w-4 h-4 text-[#F05032]" /> },
-  { name: "GitHub", level: "Active Learning", category: "Tools", icon: <FaGithub className="w-4 h-4" /> },
-  { name: "JavaScript / TypeScript", level: "Upcoming", category: "Languages", icon: <SiJavascript className="w-4 h-4 text-[#F7DF1E]" /> },
-  { name: "C++", level: "Upcoming", category: "Languages", icon: <SiCplusplus className="w-4 h-4 text-[#00599C]" /> },
-  { name: "Java", level: "Upcoming", category: "Languages", icon: <FaJava className="w-4 h-4 text-[#ED8B00]" /> },
-  { name: "React / Next.js", level: "Upcoming", category: "Frontend", icon: <SiReact className="w-4 h-4 text-[#61DAFB]" /> },
-  { name: "Express / Node.js", level: "Upcoming", category: "Backend", icon: <SiNodedotjs className="w-4 h-4 text-[#339933]" /> },
-  { name: "Tailwind CSS", level: "Upcoming", category: "Design", icon: <SiTailwindcss className="w-4 h-4 text-[#06B6D4]" /> },
-  { name: "PostgreSQL / Supabase", level: "Upcoming", category: "Database", icon: <SiPostgresql className="w-4 h-4 text-[#4169E1]" /> },
+  // ── Currently Learning ──────────────────────────────────────────────────────
+  { name: "Python (CS50P)",         level: "Active Learning", category: "Languages",  icon: <SiPython    className="w-4 h-4 text-[#3776AB]" /> },
+  { name: "CS50x: Intro to CS",     level: "Active Learning", category: "Course",     icon: <Monitor     className="w-4 h-4 text-violet-400" /> },
+  { name: "Linux & Command Line",   level: "Active Learning", category: "OS / Tools", icon: <SiLinux     className="w-4 h-4 text-[#FCC624]" /> },
+  { name: "PostgreSQL",             level: "Active Learning", category: "Database",   icon: <SiPostgresql className="w-4 h-4 text-[#4169E1]" /> },
+  { name: "Git & Version Control",  level: "Active Learning", category: "Tools",      icon: <SiGit       className="w-4 h-4 text-[#F05032]" /> },
+  { name: "GitHub",                 level: "Active Learning", category: "Tools",      icon: <FaGithub    className="w-4 h-4" /> },
+  // ── On the Roadmap ───────────────────────────────────────────────────────────
+  { name: "C++",                    level: "Upcoming",        category: "Languages",  icon: <SiCplusplus className="w-4 h-4 text-[#00599C]" /> },
+  { name: "Java",                   level: "Upcoming",        category: "Languages",  icon: <FaJava      className="w-4 h-4 text-[#ED8B00]" /> },
+  { name: "JavaScript / TypeScript",level: "Upcoming",        category: "Languages",  icon: <SiJavascript className="w-4 h-4 text-[#F7DF1E]" /> },
+  { name: "React / Next.js",        level: "Upcoming",        category: "Frontend",   icon: <SiReact     className="w-4 h-4 text-[#61DAFB]" /> },
+  { name: "Express / Node.js",      level: "Upcoming",        category: "Backend",    icon: <SiNodedotjs className="w-4 h-4 text-[#339933]" /> },
+  { name: "Tailwind CSS",           level: "Upcoming",        category: "Design",     icon: <SiTailwindcss className="w-4 h-4 text-[#06B6D4]" /> },
 ];
 
+// Timeline is chronological — most recent first.
+// Add a new entry here every time you hit a meaningful learning milestone.
 const MILESTONES = [
-  { date: "June 2026", title: "Coded Chapter Launched", desc: "First deployment of my self-taught dev log and community Q&A platform." },
-  { date: "May 2026", title: "Entering full-stack backend development", desc: "Learned Node.js, Express middleware logic, and database schemas with Supabase." },
-  { date: "April 2026", title: "Mastering modern React", desc: "Built multiple interactive apps using custom hooks, state management, and Tailwind CSS." },
-  { date: "March 2026", title: "The First Hello World", desc: "Wrote my very first line of JavaScript code and fell down the programming rabbit hole." },
+  { date: "July 2026",  title: "CS50x + Linux + PostgreSQL",          desc: "Enrolled in Harvard's CS50x to build proper CS fundamentals. Simultaneously picking up Linux command line and PostgreSQL as core tools." },
+  { date: "June 2026", title: "Coded Chapter Launched",               desc: "First public deployment of my self-taught dev log and community Q&A platform." },
+  { date: "May 2026",  title: "Entered full-stack backend development", desc: "Learned Node.js, Express middleware logic, and database schemas with Supabase." },
+  { date: "April 2026",title: "Mastering modern React",               desc: "Built interactive apps using custom hooks, state management, and Tailwind CSS." },
+  { date: "March 2026",title: "The First Hello World",                desc: "Wrote my very first line of JavaScript and fell down the programming rabbit hole." },
 ];
 
 const PHOTOS = [
@@ -231,13 +242,16 @@ export default function AboutPage() {
           </h2>
           <div className="text-sm text-muted-foreground leading-relaxed space-y-4">
             <p>
-              I started my programming journey with a simple question: <em>"How does this web application actually run?"</em> What began as curious exploration quickly evolved into a dedicated passion for building clean, user-focused web software.
+              I started my programming journey with a simple question: <em>"How does this web application actually run?"</em> What began as curious exploration quickly evolved into a dedicated passion for building clean, well-understood software.
             </p>
             <p>
-              Currently, my focus is on learning Python, following the renowned <strong>CS50P (Introduction to Programming with Python)</strong> course from YouTube. Having completed school education, I am preparing to join college in a few months. As I transition into university, my upcoming focus will be mastering <strong>C++</strong>, <strong>Java</strong>, or other core programming languages based on my college curriculum.
+              Right now I'm working through three things in parallel: <strong>CS50x</strong> (Harvard's Introduction to Computer Science) to build proper CS fundamentals from scratch, <strong>PostgreSQL</strong> to understand how data actually lives and breathes in a real backend, and <strong>Linux</strong> to get comfortable with the command line and the environment most servers run on. I also finished <strong>CS50P</strong> (Python) earlier this year.
             </p>
             <p>
-              <strong>Coded Chapter</strong> was created to serve as my public log of this learning process. I believe that learning in public is one of the most effective ways to build deep comprehension, retain technical concepts, and connect with other developers worldwide.
+              Having completed school, I am heading to college in a few months. Once there, the plan is to tackle <strong>C++</strong> and <strong>Java</strong> depending on what the curriculum asks for. The foundations I am building now will make that a lot easier.
+            </p>
+            <p>
+              <strong>Coded Chapter</strong> is my public log of all of this. Every confusion, every bug, every moment of clarity, written down as it happens. Learning in public keeps me honest and hopefully useful to someone else on the same road.
             </p>
           </div>
         </motion.div>
@@ -301,21 +315,39 @@ export default function AboutPage() {
           className="bg-card border border-border/80 rounded-2xl p-6 md:p-8 space-y-4"
         >
           <h2 className="text-lg font-bold flex items-center gap-2 border-b border-border/40 pb-3" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
-            <Code className="w-4 h-4 text-primary" /> Current Stack
+            <Code className="w-4 h-4 text-primary" /> Learning Stack
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {SKILLS.map((skill) => (
-              <div key={skill.name} className="p-3 bg-background/50 border border-border/60 rounded-xl space-y-1.5 hover:border-primary/20 transition-colors">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    {skill.icon}
-                    <span className="font-semibold text-foreground">{skill.name}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {SKILLS.map((skill) => {
+              const isActive = skill.level === "Active Learning";
+              return (
+                <div
+                  key={skill.name}
+                  className={`p-3 border rounded-xl space-y-1.5 transition-colors ${
+                    isActive
+                      ? "bg-primary/5 border-primary/20 hover:border-primary/40"
+                      : "bg-background/50 border-border/60 hover:border-border"
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      {skill.icon}
+                      <span className="font-semibold text-foreground">{skill.name}</span>
+                    </div>
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? "text-primary bg-primary/10 border border-primary/20"
+                          : "text-muted-foreground bg-muted/60"
+                      }`}
+                    >
+                      {skill.level}
+                    </span>
                   </div>
-                  <span className="text-[10px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-full">{skill.level}</span>
+                  <div className="text-[10px] text-muted-foreground/70">{skill.category}</div>
                 </div>
-                <div className="text-[10px] text-muted-foreground">{skill.category}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
 

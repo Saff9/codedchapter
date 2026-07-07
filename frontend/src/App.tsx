@@ -11,7 +11,7 @@ import { Layout } from "./components/layout";
 import { AuthProvider } from "./lib/auth-context";
 import { ScreenGuard } from "./components/screen-guard";
 
-// Lazy loaded page components
+// Lazy loaded page components — each chunk is only fetched when the user navigates to that route.
 const Home = lazy(() => import("./pages/home"));
 const TechLogs = lazy(() => import("./pages/tech-logs"));
 const GeneralLogs = lazy(() => import("./pages/general-logs"));
@@ -33,6 +33,7 @@ function BlogRedirect() {
   return <Redirect to={`/tech${search}`} replace />;
 }
 
+// Full-page loading spinner shown during lazy chunk fetches
 function PageLoader() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
@@ -42,10 +43,20 @@ function PageLoader() {
   );
 }
 
+// Scrolls the window back to the top whenever the route changes.
+// Without this, navigating from the footer leaves you mid-page on the new route.
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
 
 function AppRoutes() {
   const [location] = useLocation();
 
+  // Keep the browser tab title in sync with the current route
   useEffect(() => {
     let title = "Coded Chapter";
     if (location === "/") {
@@ -85,6 +96,8 @@ function AppRoutes() {
 
   return (
     <Suspense fallback={<PageLoader />}>
+      {/* Scroll to top whenever the route changes */}
+      <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/tech" component={TechLogs} />

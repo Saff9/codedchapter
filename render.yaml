@@ -7,11 +7,29 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Your Supabase Postgres connection string.
+      # Use the pooler URL (port 6543) for best results on serverless.
       - key: DATABASE_URL
         sync: false
+      # Your Vercel frontend URL — used for CORS so only your frontend can call the API.
       - key: FRONTEND_URL
         sync: false
+      # Your Supabase JWT secret — used to verify user login tokens.
+      # Found in: Supabase Dashboard > Project Settings > API > JWT Secret
       - key: SUPABASE_JWT_SECRET
         sync: false
+      # The email address that can publish and delete posts.
       - key: ADMIN_EMAIL
+        sync: false
+      # Supabase project URL — needed for any Supabase SDK calls on the backend.
+      - key: SUPABASE_URL
+        sync: false
+      # Supabase anon key — public key for unauthenticated Supabase operations.
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      # Optional but recommended: Upstash Redis for rate limiting across instances.
+      # Without this, rate limits reset on every deploy.
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
         sync: false

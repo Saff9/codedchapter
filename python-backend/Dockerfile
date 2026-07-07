@@ -1,65 +1,85 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Coded Chapter — Python Backend Dockerfile
-# Production-ready Docker image using Python 3.12 slim
+#
+# Build stages:
+#   builder     — installs Python deps + compiles rss_parser.c
+#   production  — minimal runtime image, no build tools
 # ──────────────────────────────────────────────────────────────────────────────
 
 FROM python:3.12-slim AS base
 
-# System hardening — no interactive apt prompts
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install only essential system deps (no build tools bloat)
+
+# ── Builder Stage ─────────────────────────────────────────────────────────────
+# Has gcc so we can compile rss_parser.c.
+# Nothing from this stage leaks into the final image except what we COPY.
+FROM base AS builder
+
+# gcc for the C RSS parser, curl for the health check
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --prefix=/install -r requirements.txt
+
+# Copy source and compile the C RSS parser into a shared library.
+# If gcc somehow fails, build_c.py exits 1 but we ignore it (|| true)
+# so the image still builds and the server falls back to the Python parser.
+COPY rss_parser.c build_c.py ./
+RUN python build_c.py || true
+
+
+# ── Final Production Image ────────────────────────────────────────────────────
+# Does NOT include gcc — smaller attack surface.
+FROM base AS production
+
+# curl stays in the final image for the health check
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# ── Builder Stage ─────────────────────────────────────────────────────────────
-FROM base AS builder
-
-WORKDIR /build
-
-COPY requirements.txt .
-
-# Install all Python dependencies into /install for clean copy
-RUN pip install --prefix=/install -r requirements.txt
-
-# ── Final Production Image ────────────────────────────────────────────────────
-FROM base AS production
-
-# Create non-root user for security
+# Non-root user — if an attacker breaks out of the app, they get this user,
+# not root, and can't write to system paths.
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 WORKDIR /app
 
-# Copy installed packages from builder
+# Python packages from builder
 COPY --from=builder /install /usr/local
 
-# Copy application code
+# Application code
 COPY . .
 
-# Fix permissions
+# Compiled C shared library from builder (may not exist if gcc failed — that's ok)
+COPY --from=builder /build/rss_parser.so ./rss_parser.so 2>/dev/null || true
+
+# Lock down ownership
 RUN chown -R appuser:appuser /app
 
-# Switch to non-root user
 USER appuser
 
-# Expose application port
 EXPOSE 8000
 
-# Health check — Docker monitors this to restart unhealthy containers
+# Docker monitors this. If /api/health returns non-200 three times in a row,
+# Docker marks the container unhealthy and Render/Railway will restart it.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8000/api/health || exit 1
 
-# Start with Gunicorn + Uvicorn workers for production
-# - 4 workers = good for most Render/Railway instances (2 vCPU)
-# - Adjust -w based on available CPUs: (2 × CPUs) + 1
+# Gunicorn + Uvicorn workers for async FastAPI.
+# Workers = (2 × vCPUs) + 1. Render free tier has 1 vCPU so 3 is fine.
 CMD ["gunicorn", "main:app", \
     "--worker-class", "uvicorn.workers.UvicornWorker", \
-    "--workers", "4", \
+    "--workers", "3", \
     "--bind", "0.0.0.0:8000", \
     "--timeout", "120", \
     "--keepalive", "5", \

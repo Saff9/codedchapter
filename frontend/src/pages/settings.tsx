@@ -138,7 +138,7 @@ export default function SettingsPage() {
             <div className="bg-card border border-border rounded-xl p-6 space-y-5">
               <div className="text-xs font-mono text-muted-foreground border-b border-border/40 pb-3">Identity</div>
 
-              <Field label="Username" hint="Your @handle — visible in your profile URL and comments">
+              <Field label="Username" hint="Your @handle, visible in your profile URL and comments">
                 <div className="relative">
                   <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input

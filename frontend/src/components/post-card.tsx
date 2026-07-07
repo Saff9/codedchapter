@@ -23,7 +23,7 @@ const FALLBACK_COLORS = [
   "text-sky-400 bg-sky-400/10 border-sky-400/25",
 ];
 
-// Gradient stops for the top glow stripe (first tag determines colour)
+// Gradient stops for the top glow stripe — first tag drives the colour
 const STRIPE_GRADIENTS: Record<string, string> = {
   python:     "from-sky-500/80 via-sky-400/40 to-transparent",
   javascript: "from-yellow-500/80 via-yellow-400/40 to-transparent",
@@ -36,7 +36,7 @@ const STRIPE_GRADIENTS: Record<string, string> = {
   web:        "from-cyan-500/80 via-cyan-400/40 to-transparent",
 };
 
-// Mesh background accent colours that bleed into card on hover
+// Subtle mesh colour bleed on hover
 const MESH_COLORS: Record<string, string> = {
   python:     "group-hover:bg-sky-500/[0.04]",
   javascript: "group-hover:bg-yellow-500/[0.04]",
@@ -80,6 +80,8 @@ interface Post {
   readingTimeMinutes: number;
   commentCount: number;
   createdAt: string;
+  // coverImage comes from the Substack RSS feed; may be undefined for older posts
+  coverImage?: string;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -96,17 +98,13 @@ export function PostCard({ post }: { post: Post }) {
           "transition-all duration-300",
           "hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1",
         ].join(" ")}
-        style={{
-          // Premium glow ring on hover via boxShadow; Tailwind can't do arbitrary
-          // multi-shadow reliably, so we inline just the hover glow
-        }}
         whileHover={{
           boxShadow:
             "0 20px 40px -12px rgba(0,0,0,0.35), 0 0 0 1px rgba(245,158,11,0.12), 0 0 24px 0 rgba(245,158,11,0.06)",
         }}
         transition={{ duration: 0.25 }}
       >
-        {/* ── Gradient glow top stripe ── */}
+        {/* ── Gradient glow top stripe (driven by first tag) ── */}
         <div
           className={`h-[3px] w-full bg-gradient-to-r ${stripeGradient(primaryTag)} opacity-60 group-hover:opacity-100 transition-opacity duration-300`}
         />
@@ -118,6 +116,25 @@ export function PostCard({ post }: { post: Post }) {
 
         {/* ── Corner glow orb (top-right) ── */}
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+        {/* ── Cover image from Substack RSS ──
+             Uses a fixed 16:9 aspect ratio box so cards stay uniform height
+             regardless of whether an image is present. loading="lazy" keeps
+             the initial page paint fast — the browser only fetches images
+             as they scroll into the viewport.                               ── */}
+        {post.coverImage && (
+          <div className="relative w-full aspect-video overflow-hidden">
+            <img
+              src={post.coverImage}
+              alt={post.title}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+            {/* Subtle darkening gradient so tags/title don't clash if overlaid later */}
+            <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent pointer-events-none" />
+          </div>
+        )}
 
         {/* ── Content ── */}
         <div className="relative flex flex-col flex-1 p-5 gap-3">
@@ -161,11 +178,10 @@ export function PostCard({ post }: { post: Post }) {
             {post.excerpt}
           </p>
 
-          {/* Footer */}
+          {/* Footer row: author + date + reading time */}
           <div className="flex items-center justify-between pt-3 border-t border-border/40 mt-auto gap-2">
-            {/* Author */}
+            {/* Author avatar initial */}
             <div className="flex items-center gap-2 min-w-0">
-              {/* Avatar initial circle with amber gradient */}
               <span
                 className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[9px] font-bold uppercase text-black select-none"
                 style={{
@@ -183,7 +199,7 @@ export function PostCard({ post }: { post: Post }) {
               </span>
             </div>
 
-            {/* Date + Reading time */}
+            {/* Date + reading time */}
             <div
               className="flex items-center gap-3 text-[11px] text-muted-foreground shrink-0"
               style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}

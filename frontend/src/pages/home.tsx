@@ -9,21 +9,23 @@ import { ArrowRight, BookOpen, Flame, Star, Zap, Terminal } from "lucide-react";
 const tagColors = ["tag-amber", "tag-violet", "tag-emerald", "tag-blue", "tag-rose", "tag-cyan"];
 
 const CODE_TEXT = `const me = {
-  name: "New Developer",
-  goal: "Software Engineer",
-  progress: learning,
+  name: "Owais",
+  learning: ["CS50x", "Linux", "PostgreSQL"],
+  doing: CS50P,
 };
 // Every chapter gets me closer
-while (me.progress !== "done") {
+while (me.learning.length > 0) {
   me.write("a new chapter");
+  me.progress++;
 }`;
 
 function highlightCodeLine(line: string) {
   return line
     .replace(/(const|while)\b/g, '<span class="text-violet-400 font-semibold">$1</span>')
-    .replace(/\b(me|learning)\b/g, '<span class="text-sky-300">$1</span>')
-    .replace(/\b(name|goal|progress)\b/g, '<span class="text-amber-400">$1</span>')
-    .replace(/("New Developer"|"Software Engineer"|"a new chapter"|"done")/g, '<span class="text-emerald-400">$1</span>')
+    .replace(/\b(me|CS50P)\b/g, '<span class="text-sky-300">$1</span>')
+    .replace(/\b(name|learning|doing|progress)\b/g, '<span class="text-amber-400">$1</span>')
+    .replace(/("Owais"|"CS50x"|"Linux"|"PostgreSQL"|"a new chapter")/g, '<span class="text-emerald-400">$1</span>')
+    .replace(/(length|write|progress\+\+)/g, '<span class="text-rose-400">$1</span>')
     .replace(/(\/\/.*)/g, '<span class="text-zinc-500 italic">$1</span>');
 }
 
@@ -456,8 +458,8 @@ export default function Home() {
                 className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 text-zinc-300 text-xs font-medium font-mono backdrop-blur-md shadow-inner shadow-white/5"
               >
                 <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-35"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500/50"></span>
                 </span>
                 <span className="text-zinc-500">LOG STATE:</span>
                 <span className="text-amber-400 font-bold tracking-wide">CHAPTER 1 // ACTIVE</span>
@@ -487,7 +489,7 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: 0.15 }}
                   className="text-zinc-400 text-base md:text-lg leading-relaxed max-w-lg font-normal"
                 >
-                  Coded Chapter is my daily log as I begin my journey from zero to software engineer — one concept at a time, in plain English, with all the confusion left in.
+                  Coded Chapter is my daily log as I learn to code. One concept at a time, in plain English, with all the confusion left in.
                 </motion.p>
               </div>
 
@@ -520,9 +522,9 @@ export default function Home() {
                 className="grid grid-cols-3 gap-4 pt-8 border-t border-zinc-800/80 w-full max-w-lg"
               >
                 {[
-                  { value: "01", title: "Full-Stack Dev", desc: "Python & TS Journey" },
-                  { value: "100%", title: "Raw Learning", desc: "Zero filter applied" },
-                  { value: "Daily", title: "Chapter Logs", desc: "Every step detailed" }
+                  { value: "CS50x",   title: "Current Course",   desc: "Harvard Intro to CS" },
+                  { value: "Linux",   title: "OS & CLI",          desc: "Active daily practice" },
+                  { value: "Postgres",title: "Database",          desc: "Learning SQL & schemas" },
                 ].map(({ value, title, desc }) => (
                   <div key={title} className="flex flex-col p-4 rounded-xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-sm shadow-sm">
                     <span className="text-xl font-bold font-display text-white">{value}</span>
@@ -597,10 +599,13 @@ export default function Home() {
               </h2>
               <div className="space-y-4 text-zinc-400 leading-relaxed font-normal text-base">
                 <p>
-                  I started Coded Chapter because I am currently learning how to code, and I just started my journey. Most tutorials assume you already know everything, but I don't. That's why I'm writing down every concept, every bug, every failed attempt, and every moment of clarity as it happens in real-time.
+                  I started Coded Chapter because I am learning to code and most tutorials assume you already know things I do not. So I write down every concept, every bug, every failed attempt, and every moment of clarity as it happens.
                 </p>
                 <p>
-                  If you're also learning, I hope this feels like reading notes from a classmate learning side-by-side with you, sharing the facepalms and breakthroughs.
+                  Right now I'm working through <strong className="text-zinc-200">CS50x</strong>, picking up <strong className="text-zinc-200">Linux</strong> and the command line, and learning <strong className="text-zinc-200">PostgreSQL</strong>. Alongside that, Python (CS50P) is done.
+                </p>
+                <p>
+                  If you're also learning, this should feel like notes from a classmate going through it side-by-side with you.
                 </p>
               </div>
               <Link href="/tech">
@@ -631,7 +636,7 @@ export default function Home() {
                 <div className="text-sm text-zinc-400 mb-4 font-normal">Sign up to leave comments and join the conversation.</div>
                 <Link href="/sign-up">
                   <span className="block w-full py-2.5 text-center rounded-xl bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-colors cursor-pointer active:scale-[0.98]">
-                    Create an account — it's free
+                    Create an account, it is free
                   </span>
                 </Link>
               </div>
