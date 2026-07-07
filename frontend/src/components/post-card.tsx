@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 // ─── Tag / stripe colour maps ────────────────────────────────────────────────
 
@@ -88,6 +89,10 @@ interface Post {
 
 export function PostCard({ post }: { post: Post }) {
   const primaryTag = post.tags[0] ?? "";
+  const [imgError, setImgError] = useState(false);
+
+  // Use the post cover image if available and not broken, else fall back to the site logo.
+  const showCover = post.coverImage && !imgError;
 
   return (
     <Link href={`/blog/${post.id}`}>
@@ -117,24 +122,35 @@ export function PostCard({ post }: { post: Post }) {
         {/* ── Corner glow orb (top-right) ── */}
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        {/* ── Cover image from Substack RSS ──
-             Uses a fixed 16:9 aspect ratio box so cards stay uniform height
-             regardless of whether an image is present. loading="lazy" keeps
-             the initial page paint fast — the browser only fetches images
-             as they scroll into the viewport.                               ── */}
-        {post.coverImage && (
-          <div className="relative w-full aspect-video overflow-hidden">
+        {/* ── Cover image / logo placeholder ──────────────────────────────────
+             Always renders the same 16:9 box so card heights stay uniform.
+             Shows the Substack cover image when available; falls back to the
+             site logo (favicon.png) when there is no image or the URL fails.
+             loading="lazy" — browser only fetches as the card scrolls in.   ── */}
+        <div className="relative w-full aspect-video overflow-hidden bg-[#0d0d0d]">
+          {showCover ? (
             <img
-              src={post.coverImage}
+              src={post.coverImage!}
               alt={post.title}
               loading="lazy"
               decoding="async"
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
-            {/* Subtle darkening gradient so tags/title don't clash if overlaid later */}
-            <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent pointer-events-none" />
-          </div>
-        )}
+          ) : (
+            /* Logo placeholder — shown when no cover image exists */
+            <div className="w-full h-full flex items-center justify-center">
+              <img
+                src="/favicon.png"
+                alt="Coded Chapter"
+                className="w-14 h-14 opacity-20 select-none pointer-events-none"
+                draggable={false}
+              />
+            </div>
+          )}
+          {/* Darkening gradient at the bottom edge */}
+          <div className="absolute inset-0 bg-gradient-to-t from-card/70 to-transparent pointer-events-none" />
+        </div>
 
         {/* ── Content ── */}
         <div className="relative flex flex-col flex-1 p-5 gap-3">

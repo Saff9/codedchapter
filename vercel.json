@@ -3,6 +3,27 @@
   "outputDirectory": "frontend/dist",
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.substack.com https://substackcdn.com https://*.substackcdn.com https://bucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com https://*.s3.amazonaws.com https://*.amazonaws.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.onrender.com https://codedchapter.substack.com https://api.rss2json.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
