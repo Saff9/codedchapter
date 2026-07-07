@@ -42,20 +42,27 @@ app.use(
 app.use(securityHeaders());
 app.use(compression());
 app.use(rateLimiter());
+
+// Strip trailing slashes so "https://example.com/" and "https://example.com" both match.
+// Browsers always send origins without a trailing slash, so an env var set with one
+// would silently block every request.
+const normalise = (url: string) => url.replace(/\/+$/, "");
+
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://127.0.0.1:5173",
-  process.env.FRONTEND_URL,
+  "http://127.0.0.1:5174",
+  process.env.FRONTEND_URL ? normalise(process.env.FRONTEND_URL) : null,
 ].filter(Boolean) as string[];
 
 app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
-      // Allow requests with no origin (same-origin, curl, mobile apps)
-      // and any origin that is in the allowedOrigins list.
-      // In production, FRONTEND_URL must be set correctly or cross-origin requests will be rejected.
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (same-origin, curl, Render health checks)
+      // and any origin that exactly matches our allowlist after normalisation.
+      if (!origin || allowedOrigins.includes(normalise(origin))) {
         callback(null, true);
       } else {
         callback(null, false);
