@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { FaJava } from "react-icons/fa6";
@@ -50,13 +50,419 @@ const MILESTONES = [
   { date: "March 2026",title: "The First Hello World",                desc: "Wrote my very first line of JavaScript and fell down the programming rabbit hole." },
 ];
 
-const PHOTOS = [
-  { src: "/photo1.webp", alt: "Owais by a mountain river" },
-  { src: "/photo2.webp", alt: "Owais selfie in snowy mountains" },
-  { src: "/photo3.webp", alt: "Owais looking up in the pine forest" },
-  { src: "/photo4.webp", alt: "Owais mirror selfie" },
-  { src: "/photo5.webp", alt: "Owais sitting on a log in the forest" },
-  { src: "/photo6.webp", alt: "Owais looking at hills and valley" }
+// Developer Logo Animation replacing static avatar
+function DeveloperLogoAnimation() {
+  return (
+    <div className="relative w-32 h-32 rounded-full flex items-center justify-center bg-card border border-border/80 overflow-hidden shadow-xl group">
+      {/* Rotating Gradient Rings */}
+      <motion.div 
+        className="absolute inset-0.5 rounded-full border border-dashed border-primary/40"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div 
+        className="absolute inset-2 rounded-full border border-dotted border-secondary/40"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+      {/* Glowing Backlight */}
+      <div className="absolute inset-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-sm group-hover:scale-110 transition-transform duration-500" />
+      
+      {/* Central Terminal Icon */}
+      <div className="relative font-mono text-xl font-bold flex flex-col items-center select-none z-10">
+        <motion.span 
+          className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-400"
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          &lt;OC/&gt;
+        </motion.span>
+        <motion.span 
+          className="text-[8px] text-muted-foreground mt-1"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          [active]
+        </motion.span>
+      </div>
+    </div>
+  );
+}
+
+// Chapter 1 Visual: The Spark
+function SparkVisual() {
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setRipples((prev) => [...prev, { id: Date.now(), x, y }]);
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (ripples.length > 0) {
+      timer = setTimeout(() => {
+        setRipples((prev) => prev.slice(1));
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [ripples]);
+
+  return (
+    <div 
+      ref={containerRef}
+      onClick={handleClick}
+      className="w-full h-full bg-gradient-to-b from-background to-muted/20 flex items-center justify-center relative overflow-hidden cursor-pointer"
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+      
+      <div className="relative">
+        <motion.div 
+          className="w-20 h-20 rounded-full bg-gradient-to-r from-primary/30 to-secondary/30 blur-xl absolute -left-10 -top-10"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 4, repeat: Infinity }}
+        />
+        <motion.div 
+          className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-amber-500 flex items-center justify-center shadow-lg relative z-10 border border-white/20"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <Code className="w-4 h-4 text-white" />
+        </motion.div>
+      </div>
+
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full bg-primary"
+          style={{
+            left: "50%",
+            top: "50%",
+          }}
+          animate={{
+            x: [
+              Math.cos((i * Math.PI) / 3) * 60,
+              Math.cos((i * Math.PI) / 3 + Math.PI / 2) * 90,
+              Math.cos((i * Math.PI) / 3 + Math.PI) * 60,
+              Math.cos((i * Math.PI) / 3 + 1.5 * Math.PI) * 90,
+              Math.cos((i * Math.PI) / 3) * 60,
+            ],
+            y: [
+              Math.sin((i * Math.PI) / 3) * 60,
+              Math.sin((i * Math.PI) / 3 + Math.PI / 2) * 40,
+              Math.sin((i * Math.PI) / 3 + Math.PI) * 60,
+              Math.sin((i * Math.PI) / 3 + 1.5 * Math.PI) * 40,
+              Math.sin((i * Math.PI) / 3) * 60,
+            ],
+            scale: [1, 1.4, 0.8, 1.2, 1],
+            opacity: [0.6, 1, 0.4, 0.9, 0.6],
+          }}
+          transition={{
+            duration: 8 + i,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+      ))}
+
+      {ripples.map((ripple) => (
+        <motion.div
+          key={ripple.id}
+          className="absolute rounded-full border border-primary/60 bg-primary/5 pointer-events-none"
+          style={{
+            left: ripple.x - 50,
+            top: ripple.y - 50,
+            width: 100,
+            height: 100,
+          }}
+          initial={{ scale: 0.1, opacity: 1 }}
+          animate={{ scale: 2.5, opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        />
+      ))}
+
+      <div className="absolute top-8 left-8 font-mono text-[9px] text-muted-foreground/60 select-none bg-background/40 backdrop-blur-sm border border-border/30 rounded px-1.5 py-0.5 pointer-events-none">
+        &gt; initial_commit.sh
+      </div>
+      <div className="absolute bottom-28 right-8 font-mono text-[9px] text-primary/70 select-none bg-primary/5 border border-primary/20 rounded px-1.5 py-0.5 pointer-events-none">
+        &gt; console.log("Hello World")
+      </div>
+    </div>
+  );
+}
+
+// Chapter 2 Visual: The Rabbit Hole
+function RabbitHoleVisual() {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePos({ x: 0, y: 0 });
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="w-full h-full bg-gradient-to-b from-background to-violet-950/10 flex items-center justify-center relative overflow-hidden"
+      style={{ perspective: "1000px" }}
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+
+      <motion.div 
+        className="w-full h-full flex items-center justify-center absolute inset-0 pointer-events-none"
+        animate={{
+          rotateX: mousePos.y * 30,
+          rotateY: -mousePos.x * 30,
+        }}
+        transition={{ type: "spring", stiffness: 60, damping: 15 }}
+      >
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-2xl border border-secondary/20 bg-secondary/[0.01]"
+            style={{
+              width: 100 + i * 60,
+              height: 100 + i * 60,
+            }}
+            animate={{
+              rotate: [i * 15, i * 15 + 360],
+              scale: [0.8, 1.1, 0.8],
+              borderColor: [
+                "rgba(139, 92, 246, 0.1)",
+                "rgba(139, 92, 246, 0.3)",
+                "rgba(139, 92, 246, 0.1)"
+              ]
+            }}
+            transition={{
+              rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
+              scale: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }
+            }}
+          />
+        ))}
+      </motion.div>
+
+      <div className="relative font-mono text-[10px] text-secondary/80 bg-background/60 border border-secondary/20 p-3 rounded-lg backdrop-blur-sm shadow-xl flex flex-col space-y-1 z-10 max-w-[240px] pointer-events-none select-none">
+        <div className="text-[8px] text-muted-foreground">// Every chapter gets me closer</div>
+        <div className="text-secondary"><span className="text-pink-500">while</span> (me.progress !== <span className="text-amber-400">"done"</span>) &#123;</div>
+        <div className="pl-4 text-foreground">me.write(<span className="text-green-400">"a new chapter"</span>);</div>
+        <div>&#125;</div>
+      </div>
+
+      <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
+        INTERACTIVE // MOVE MOUSE TO TILT
+      </div>
+    </div>
+  );
+}
+
+// Chapter 3 Visual: Full-Stack Connect
+function FullStackVisual() {
+  const [pulseCount, setPulseCount] = useState(0);
+
+  const triggerPacket = () => {
+    setPulseCount((prev) => prev + 1);
+  };
+
+  return (
+    <div className="w-full h-full bg-gradient-to-b from-background to-amber-950/10 flex items-center justify-between px-16 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+      <motion.div 
+        onClick={triggerPacket}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-24 h-24 rounded-2xl bg-card border border-border hover:border-primary/50 shadow-xl flex flex-col items-center justify-center cursor-pointer select-none space-y-1.5 relative z-10"
+      >
+        <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-sm opacity-50 pointer-events-none" />
+        <Terminal className="w-6 h-6 text-primary pointer-events-none" />
+        <span className="font-mono text-[9px] font-bold pointer-events-none">CLIENT (UI)</span>
+        <span className="text-[8px] text-muted-foreground pointer-events-none">React / Vite</span>
+      </motion.div>
+
+      <div className="flex-1 h-0.5 border-t-2 border-dashed border-border/50 relative mx-4 pointer-events-none">
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-sm shadow-primary"
+            animate={{
+              left: ["0%", "100%"],
+              opacity: [0, 1, 1, 0]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 1,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+
+        {[...Array(pulseCount)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-secondary shadow-md shadow-secondary z-20"
+            initial={{ left: "0%" }}
+            animate={{
+              left: "100%",
+              scale: [1, 1.3, 1]
+            }}
+            transition={{
+              duration: 1.5,
+              ease: "easeOut"
+            }}
+          />
+        ))}
+      </div>
+
+      <motion.div 
+        onClick={triggerPacket}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-24 h-24 rounded-2xl bg-card border border-border hover:border-secondary/50 shadow-xl flex flex-col items-center justify-center cursor-pointer select-none space-y-1.5 relative z-10"
+      >
+        <div className="absolute inset-0 bg-secondary/5 rounded-2xl blur-sm opacity-50 pointer-events-none" />
+        <Code className="w-6 h-6 text-secondary pointer-events-none" />
+        <span className="font-mono text-[9px] font-bold pointer-events-none">SERVER (API)</span>
+        <span className="text-[8px] text-muted-foreground pointer-events-none">Python FastAPI</span>
+      </motion.div>
+
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] text-muted-foreground/60 bg-background/50 border border-border/30 rounded px-2 py-0.5 pointer-events-none">
+        {"GET /api/posts/featured -> 200 OK"}
+      </div>
+
+      <div className="absolute bottom-28 left-1/2 -translate-x-1/2 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
+        CLICK EITHER NODE TO EMIT DATA
+      </div>
+    </div>
+  );
+}
+
+// Chapter 4 Visual: Security Shield
+function SecurityVisual() {
+  const [shieldActive, setShieldActive] = useState(true);
+
+  return (
+    <div 
+      onClick={() => setShieldActive(!shieldActive)}
+      className="w-full h-full bg-gradient-to-b from-background to-emerald-950/10 flex items-center justify-center relative overflow-hidden cursor-pointer"
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:18px_18px] pointer-events-none" />
+
+      <motion.div 
+        className="absolute inset-x-0 h-0.5 bg-emerald-500/30 shadow-lg shadow-emerald-500/50 pointer-events-none z-10"
+        animate={{
+          top: ["0%", "100%", "0%"]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      <div className="relative flex items-center justify-center">
+        <motion.div 
+          className="absolute w-36 h-36 rounded-full border-2 border-dashed border-emerald-500/20 pointer-events-none"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        />
+
+        <motion.div 
+          className="absolute w-28 h-28 rounded-full border border-dashed border-emerald-400/30 pointer-events-none"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        />
+
+        <AnimatePresence>
+          {shieldActive && (
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1.1, opacity: 0.25 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className="absolute w-28 h-28 rounded-full bg-emerald-500/30 blur-md pointer-events-none"
+              transition={{ duration: 0.3 }}
+            />
+          )}
+        </AnimatePresence>
+
+        <motion.div 
+          className={`w-16 h-16 rounded-full flex flex-col items-center justify-center border-2 shadow-xl z-20 transition-colors duration-300 pointer-events-none ${
+            shieldActive 
+              ? "bg-card border-emerald-500/60 text-emerald-400 shadow-emerald-500/10" 
+              : "bg-card border-amber-500/40 text-amber-400 shadow-amber-500/10"
+          }`}
+          whileHover={{ scale: 1.05 }}
+        >
+          <motion.div
+            animate={shieldActive ? { scale: [1, 1.1, 1] } : {}}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {shieldActive ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield-off"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+            )}
+          </motion.div>
+        </motion.div>
+      </div>
+
+      <div className="absolute top-4 left-4 font-mono text-[8px] bg-background/50 border border-border/40 p-1 rounded flex items-center gap-1 pointer-events-none">
+        <span className={`w-1.5 h-1.5 rounded-full ${shieldActive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+        <span>SCREEN_GUARD: {shieldActive ? "ACTIVE" : "DISABLED"}</span>
+      </div>
+
+      <div className="absolute bottom-28 left-4 font-mono text-[8px] text-muted-foreground/50 pointer-events-none">
+        &gt;_ anti_screenshot.py
+      </div>
+      
+      <div className="absolute bottom-28 right-4 font-mono text-[8px] text-muted-foreground/50 pointer-events-none">
+        &gt;_ anti_record.ts
+      </div>
+
+      <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
+        CLICK TO TOGGLE GUARD
+      </div>
+    </div>
+  );
+}
+
+const CHAPTER_VISUALS = [
+  {
+    title: "Chapter 1: The Spark",
+    description: "Wrote the first lines of code. The neural network of learning activates. Click to emit ripples.",
+    component: SparkVisual
+  },
+  {
+    title: "Chapter 2: The Rabbit Hole",
+    description: "Exploring states, recursive loops, and design systems. Move mouse over the area to tilt.",
+    component: RabbitHoleVisual
+  },
+  {
+    title: "Chapter 3: Full-Stack Connect",
+    description: "Connecting React user interfaces to Python backends. Click either node to send custom packets.",
+    component: FullStackVisual
+  },
+  {
+    title: "Chapter 4: Security Shield",
+    description: "Configuring screen capture protection and backend route hardening. Click to toggle shield.",
+    component: SecurityVisual
+  }
 ];
 
 export default function AboutPage() {
@@ -89,11 +495,11 @@ export default function AboutPage() {
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % PHOTOS.length);
+    setCurrentIndex((prev) => (prev + 1) % CHAPTER_VISUALS.length);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + PHOTOS.length) % PHOTOS.length);
+    setCurrentIndex((prev) => (prev - 1 + CHAPTER_VISUALS.length) % CHAPTER_VISUALS.length);
   };
 
   return (
@@ -112,15 +518,7 @@ export default function AboutPage() {
         >
           {/* Avatar frame */}
           <div className="relative shrink-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary blur-md rounded-full scale-105 opacity-30" />
-            <img
-              src="/avatar.png"
-              alt="Developer Avatar"
-              width="128"
-              height="128"
-              loading="eager"
-              className="relative w-32 h-32 rounded-full object-cover border-2 border-primary/40 shadow-xl"
-            />
+            <DeveloperLogoAnimation />
           </div>
 
           {/* Intro text */}
@@ -172,52 +570,53 @@ export default function AboutPage() {
               onTouchEnd={handleTouchEnd}
             >
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={currentIndex}
-                  src={PHOTOS[currentIndex].src}
-                  alt={PHOTOS[currentIndex].alt}
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 1.02 }}
                   transition={{ duration: 0.3 }}
-                  className="w-full h-full object-cover pointer-events-none"
-                />
+                  className="w-full h-full"
+                >
+                  {CHAPTER_VISUALS[currentIndex].component()}
+                </motion.div>
               </AnimatePresence>
               
               {/* Gradient Overlay for labels */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-6 pt-16 flex flex-col justify-end">
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-6 pt-16 flex flex-col justify-end pointer-events-none z-30">
                 <span className="text-[10px] font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded self-start mb-2">
-                  IMAGE 0{currentIndex + 1} / 0{PHOTOS.length}
+                  CHAPTER VISUAL 0{currentIndex + 1} / 0{CHAPTER_VISUALS.length}
                 </span>
-                <p className="text-sm font-semibold text-white tracking-wide font-sans md:text-base">{PHOTOS[currentIndex].alt}</p>
+                <p className="text-sm font-semibold text-white tracking-wide font-sans md:text-base">{CHAPTER_VISUALS[currentIndex].title}</p>
+                <p className="text-xs text-white/70 mt-1 max-w-xl">{CHAPTER_VISUALS[currentIndex].description}</p>
               </div>
             </div>
 
             {/* Navigation buttons (Desktop) */}
             <button
               onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-black/60 border border-border text-white/85 hover:text-primary hover:bg-black/90 hover:scale-105 transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center cursor-pointer"
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-black/60 border border-border text-white/85 hover:text-primary hover:bg-black/90 hover:scale-105 transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center cursor-pointer z-30"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-black/60 border border-border text-white/85 hover:text-primary hover:bg-black/90 hover:scale-105 transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-black/60 border border-border text-white/85 hover:text-primary hover:bg-black/90 hover:scale-105 transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center cursor-pointer z-30"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
 
             {/* Mobile swipe indicator */}
-            <div className="absolute top-4 right-4 text-[10px] font-mono bg-black/60 px-2.5 py-1 rounded-full text-white/60 md:hidden border border-white/10">
+            <div className="absolute top-4 right-4 text-[10px] font-mono bg-black/60 px-2.5 py-1 rounded-full text-white/60 md:hidden border border-white/10 z-30">
               ← Swipe to navigate →
             </div>
           </div>
 
           {/* Dots Indicator */}
           <div className="flex justify-center items-center gap-2 pt-2">
-            {PHOTOS.map((_, index) => (
+            {CHAPTER_VISUALS.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
