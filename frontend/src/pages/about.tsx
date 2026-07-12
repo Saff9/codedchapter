@@ -89,7 +89,7 @@ function DeveloperLogoAnimation() {
   );
 }
 
-// Chapter 1 Visual: The Spark
+// Chapter 1 Visual: The Spark (Constellation Network Spark)
 function SparkVisual() {
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,53 +118,83 @@ function SparkVisual() {
     <div 
       ref={containerRef}
       onClick={handleClick}
-      className="w-full h-full bg-gradient-to-b from-background to-muted/20 flex items-center justify-center relative overflow-hidden cursor-pointer"
+      className="w-full h-full bg-gradient-to-br from-[#0a051b] via-[#0c0824] to-[#12072b] flex items-center justify-center relative overflow-hidden cursor-pointer"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
-      
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-primary/5 blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-secondary/5 blur-[80px] pointer-events-none" />
+
+      <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
+        <line x1="20%" y1="30%" x2="50%" y2="50%" stroke="currentColor" className="text-primary" strokeWidth="1" strokeDasharray="4 4" />
+        <line x1="80%" y1="25%" x2="50%" y2="50%" stroke="currentColor" className="text-secondary" strokeWidth="1" />
+        <line x1="15%" y1="75%" x2="50%" y2="50%" stroke="currentColor" className="text-secondary" strokeWidth="1" />
+        <line x1="75%" y1="80%" x2="50%" y2="50%" stroke="currentColor" className="text-primary" strokeWidth="1" strokeDasharray="3 3" />
+      </svg>
+
+      {[
+        { left: "20%", top: "30%", color: "bg-primary", delay: 0 },
+        { left: "80%", top: "25%", color: "bg-secondary", delay: 1.5 },
+        { left: "15%", top: "75%", color: "bg-secondary", delay: 0.8 },
+        { left: "75%", top: "80%", color: "bg-primary", delay: 2.2 },
+      ].map((node, i) => (
+        <motion.div
+          key={i}
+          className={`absolute w-3 h-3 rounded-full ${node.color} opacity-40`}
+          style={{ left: node.left, top: node.top }}
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.3, 0.7, 0.3],
+          }}
+          transition={{ duration: 3, repeat: Infinity, delay: node.delay, ease: "easeInOut" }}
+        />
+      ))}
+
       <div className="relative">
         <motion.div 
-          className="w-20 h-20 rounded-full bg-gradient-to-r from-primary/30 to-secondary/30 blur-xl absolute -left-10 -top-10"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 4, repeat: Infinity }}
+          className="w-32 h-32 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-2xl absolute -left-16 -top-16"
+          animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.9, 0.6] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-amber-500 flex items-center justify-center shadow-lg relative z-10 border border-white/20"
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-primary via-amber-500 to-secondary flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] relative z-10 border border-white/20"
+          animate={{ scale: [1, 1.06, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Code className="w-4 h-4 text-white" />
+          <Code className="w-6 h-6 text-white pointer-events-none" />
         </motion.div>
       </div>
 
-      {[...Array(6)].map((_, i) => (
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-2 h-2 rounded-full bg-primary"
+          className={`absolute rounded-full pointer-events-none ${i % 2 === 0 ? "bg-primary" : "bg-secondary"}`}
           style={{
             left: "50%",
             top: "50%",
+            width: i % 3 === 0 ? "4px" : "6px",
+            height: i % 3 === 0 ? "4px" : "6px",
           }}
           animate={{
             x: [
-              Math.cos((i * Math.PI) / 3) * 60,
-              Math.cos((i * Math.PI) / 3 + Math.PI / 2) * 90,
-              Math.cos((i * Math.PI) / 3 + Math.PI) * 60,
-              Math.cos((i * Math.PI) / 3 + 1.5 * Math.PI) * 90,
-              Math.cos((i * Math.PI) / 3) * 60,
+              Math.cos((i * Math.PI) / 4) * 80,
+              Math.cos((i * Math.PI) / 4 + Math.PI / 2) * 120,
+              Math.cos((i * Math.PI) / 4 + Math.PI) * 80,
+              Math.cos((i * Math.PI) / 4 + 1.5 * Math.PI) * 120,
+              Math.cos((i * Math.PI) / 4) * 80,
             ],
             y: [
-              Math.sin((i * Math.PI) / 3) * 60,
-              Math.sin((i * Math.PI) / 3 + Math.PI / 2) * 40,
-              Math.sin((i * Math.PI) / 3 + Math.PI) * 60,
-              Math.sin((i * Math.PI) / 3 + 1.5 * Math.PI) * 40,
-              Math.sin((i * Math.PI) / 3) * 60,
+              Math.sin((i * Math.PI) / 4) * 80,
+              Math.sin((i * Math.PI) / 4 + Math.PI / 2) * 50,
+              Math.sin((i * Math.PI) / 4 + Math.PI) * 80,
+              Math.sin((i * Math.PI) / 4 + 1.5 * Math.PI) * 50,
+              Math.sin((i * Math.PI) / 4) * 80,
             ],
-            scale: [1, 1.4, 0.8, 1.2, 1],
-            opacity: [0.6, 1, 0.4, 0.9, 0.6],
+            scale: [0.6, 1.3, 0.7, 1.2, 0.6],
+            opacity: [0.2, 0.8, 0.3, 0.9, 0.2],
           }}
           transition={{
-            duration: 8 + i,
+            duration: 9 + i,
             repeat: Infinity,
             ease: "linear"
           }}
@@ -172,32 +202,35 @@ function SparkVisual() {
       ))}
 
       {ripples.map((ripple) => (
-        <motion.div
-          key={ripple.id}
-          className="absolute rounded-full border border-primary/60 bg-primary/5 pointer-events-none"
-          style={{
-            left: ripple.x - 50,
-            top: ripple.y - 50,
-            width: 100,
-            height: 100,
-          }}
-          initial={{ scale: 0.1, opacity: 1 }}
-          animate={{ scale: 2.5, opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
+        <div key={ripple.id}>
+          <motion.div
+            className="absolute rounded-full border-2 border-primary/50 bg-primary/5 pointer-events-none shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+            style={{ left: ripple.x, top: ripple.y }}
+            initial={{ width: 0, height: 0, x: 0, y: 0, opacity: 1 }}
+            animate={{ width: 160, height: 160, x: -80, y: -80, opacity: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          />
+          <motion.div
+            className="absolute rounded-full border border-secondary/40 pointer-events-none"
+            style={{ left: ripple.x, top: ripple.y }}
+            initial={{ width: 0, height: 0, x: 0, y: 0, opacity: 0.8 }}
+            animate={{ width: 260, height: 260, x: -130, y: -130, opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
+          />
+        </div>
       ))}
 
-      <div className="absolute top-8 left-8 font-mono text-[9px] text-muted-foreground/60 select-none bg-background/40 backdrop-blur-sm border border-border/30 rounded px-1.5 py-0.5 pointer-events-none">
-        &gt; initial_commit.sh
+      <div className="absolute top-6 left-6 font-mono text-[9px] text-muted-foreground/60 select-none bg-[#0a051b]/80 border border-border/20 rounded px-2 py-1 backdrop-blur-md pointer-events-none">
+        <span className="text-primary mr-1">●</span> IDE_SPARK_V1.0
       </div>
-      <div className="absolute bottom-28 right-8 font-mono text-[9px] text-primary/70 select-none bg-primary/5 border border-primary/20 rounded px-1.5 py-0.5 pointer-events-none">
+      <div className="absolute bottom-28 right-6 font-mono text-[9px] text-primary/70 select-none bg-[#0a051b]/80 border border-primary/20 rounded px-2 py-1 backdrop-blur-md pointer-events-none">
         &gt; console.log("Hello World")
       </div>
     </div>
   );
 }
 
-// Chapter 2 Visual: The Rabbit Hole
+// Chapter 2 Visual: The Rabbit Hole (3D Parallax Vortex)
 function RabbitHoleVisual() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -219,59 +252,71 @@ function RabbitHoleVisual() {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="w-full h-full bg-gradient-to-b from-background to-violet-950/10 flex items-center justify-center relative overflow-hidden"
+      className="w-full h-full bg-gradient-to-br from-[#08021c] via-[#050013] to-[#120021] flex items-center justify-center relative overflow-hidden"
       style={{ perspective: "1000px" }}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none" />
 
       <motion.div 
-        className="w-full h-full flex items-center justify-center absolute inset-0 pointer-events-none"
+        className="w-[400px] h-[400px] flex items-center justify-center absolute pointer-events-none"
         animate={{
-          rotateX: mousePos.y * 30,
-          rotateY: -mousePos.x * 30,
+          rotateX: mousePos.y * 45,
+          rotateY: -mousePos.x * 45,
         }}
-        transition={{ type: "spring", stiffness: 60, damping: 15 }}
+        transition={{ type: "spring", stiffness: 80, damping: 20 }}
       >
-        {[...Array(5)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-2xl border border-secondary/20 bg-secondary/[0.01]"
+            className="absolute rounded-full border border-secondary/20 flex items-center justify-center"
             style={{
-              width: 100 + i * 60,
-              height: 100 + i * 60,
+              width: 60 + i * 55,
+              height: 60 + i * 55,
+              borderStyle: i % 2 === 0 ? "solid" : "dashed",
+              transformStyle: "preserve-3d"
             }}
             animate={{
-              rotate: [i * 15, i * 15 + 360],
-              scale: [0.8, 1.1, 0.8],
+              rotateZ: [i * 30, i * 30 + (i % 2 === 0 ? 360 : -360)],
+              z: [i * -10, i * -25, i * -10],
               borderColor: [
-                "rgba(139, 92, 246, 0.1)",
-                "rgba(139, 92, 246, 0.3)",
-                "rgba(139, 92, 246, 0.1)"
+                "rgba(139, 92, 246, 0.15)",
+                "rgba(139, 92, 246, 0.4)",
+                "rgba(139, 92, 246, 0.15)"
               ]
             }}
             transition={{
-              rotate: { duration: 20 + i * 5, repeat: Infinity, ease: "linear" },
-              scale: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }
+              rotateZ: { duration: 15 + i * 5, repeat: Infinity, ease: "linear" },
+              z: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }
             }}
-          />
+          >
+            {i === 3 && (
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary absolute -top-1 shadow-[0_0_8px_rgba(139,92,246,0.8)] animate-pulse" />
+            )}
+            {i === 4 && (
+              <div className="w-1.5 h-1.5 rounded-full bg-primary absolute -bottom-1 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse" />
+            )}
+          </motion.div>
         ))}
       </motion.div>
 
-      <div className="relative font-mono text-[10px] text-secondary/80 bg-background/60 border border-secondary/20 p-3 rounded-lg backdrop-blur-sm shadow-xl flex flex-col space-y-1 z-10 max-w-[240px] pointer-events-none select-none">
-        <div className="text-[8px] text-muted-foreground">// Every chapter gets me closer</div>
-        <div className="text-secondary"><span className="text-pink-500">while</span> (me.progress !== <span className="text-amber-400">"done"</span>) &#123;</div>
-        <div className="pl-4 text-foreground">me.write(<span className="text-green-400">"a new chapter"</span>);</div>
+      <div className="relative font-mono text-[10px] text-secondary/90 bg-[#09021c]/80 border border-secondary/20 p-4 rounded-xl backdrop-blur-md shadow-2xl flex flex-col space-y-1.5 z-10 max-w-[260px] pointer-events-none select-none">
+        <div className="text-[8px] text-muted-foreground flex justify-between">
+          <span>// Every chapter gets me closer</span>
+          <span className="text-secondary/50 animate-pulse">● CODE</span>
+        </div>
+        <div className="text-secondary border-t border-secondary/10 pt-2"><span className="text-pink-500">while</span> (me.progress !== <span className="text-amber-400">"done"</span>) &#123;</div>
+        <div className="pl-4 text-foreground border-l-2 border-primary/30 ml-1 py-0.5">me.write(<span className="text-green-400">"a new chapter"</span>);</div>
         <div>&#125;</div>
       </div>
 
-      <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
-        INTERACTIVE // MOVE MOUSE TO TILT
+      <div className="absolute top-6 right-6 font-mono text-[8px] text-muted-foreground/50 pointer-events-none">
+        PARALLAX GRID // TILT EFFECT
       </div>
     </div>
   );
 }
 
-// Chapter 3 Visual: Full-Stack Connect
+// Chapter 3 Visual: Full-Stack Connect (Interactive Glass Diagram)
 function FullStackVisual() {
   const [pulseCount, setPulseCount] = useState(0);
 
@@ -280,35 +325,43 @@ function FullStackVisual() {
   };
 
   return (
-    <div className="w-full h-full bg-gradient-to-b from-background to-amber-950/10 flex items-center justify-between px-16 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+    <div 
+      onClick={triggerPacket}
+      className="w-full h-full bg-gradient-to-br from-[#0c051a] via-[#090515] to-[#1d0a2d] flex items-center justify-between px-12 relative overflow-hidden cursor-pointer"
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
       <motion.div 
-        onClick={triggerPacket}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-24 h-24 rounded-2xl bg-card border border-border hover:border-primary/50 shadow-xl flex flex-col items-center justify-center cursor-pointer select-none space-y-1.5 relative z-10"
+        whileHover={{ scale: 1.03, y: -2 }}
+        whileTap={{ scale: 0.97 }}
+        className="w-28 h-28 rounded-2xl bg-[#0d0720]/80 border border-primary/30 hover:border-primary/60 shadow-[0_0_20px_rgba(245,158,11,0.05)] flex flex-col items-center justify-center select-none space-y-2 relative z-10 backdrop-blur-md transition-all pointer-events-none"
       >
-        <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-sm opacity-50 pointer-events-none" />
-        <Terminal className="w-6 h-6 text-primary pointer-events-none" />
-        <span className="font-mono text-[9px] font-bold pointer-events-none">CLIENT (UI)</span>
-        <span className="text-[8px] text-muted-foreground pointer-events-none">React / Vite</span>
+        <div className="absolute inset-0.5 rounded-2xl border border-white/5 pointer-events-none" />
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+          <Terminal className="w-5 h-5" />
+        </div>
+        <div className="text-center">
+          <span className="font-mono text-[9px] font-bold block text-foreground">CLIENT (UI)</span>
+          <span className="text-[7px] text-muted-foreground font-mono">React + TS + Vite</span>
+        </div>
       </motion.div>
 
-      <div className="flex-1 h-0.5 border-t-2 border-dashed border-border/50 relative mx-4 pointer-events-none">
+      <div className="flex-1 h-0.5 border-t border-dashed border-border/40 relative mx-3 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/15 to-secondary/10 w-full h-[2px] blur-sm" />
+        
         {[...Array(3)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-sm shadow-primary"
+            className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/70 shadow-[0_0_8px_var(--primary)]"
             animate={{
               left: ["0%", "100%"],
               opacity: [0, 1, 1, 0]
             }}
             transition={{
-              duration: 3,
+              duration: 4,
               repeat: Infinity,
-              delay: i * 1,
-              ease: "easeInOut"
+              delay: i * 1.33,
+              ease: "linear"
             }}
           />
         ))}
@@ -316,14 +369,14 @@ function FullStackVisual() {
         {[...Array(pulseCount)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-secondary shadow-md shadow-secondary z-20"
+            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(139,92,246,0.8)] z-20"
             initial={{ left: "0%" }}
             animate={{
               left: "100%",
-              scale: [1, 1.3, 1]
+              scale: [1, 1.4, 1]
             }}
             transition={{
-              duration: 1.5,
+              duration: 1.8,
               ease: "easeOut"
             }}
           />
@@ -331,112 +384,120 @@ function FullStackVisual() {
       </div>
 
       <motion.div 
-        onClick={triggerPacket}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-24 h-24 rounded-2xl bg-card border border-border hover:border-secondary/50 shadow-xl flex flex-col items-center justify-center cursor-pointer select-none space-y-1.5 relative z-10"
+        whileHover={{ scale: 1.03, y: -2 }}
+        whileTap={{ scale: 0.97 }}
+        className="w-28 h-28 rounded-2xl bg-[#0d0720]/80 border border-secondary/30 hover:border-secondary/60 shadow-[0_0_20px_rgba(139,92,246,0.05)] flex flex-col items-center justify-center select-none space-y-2 relative z-10 backdrop-blur-md transition-all pointer-events-none"
       >
-        <div className="absolute inset-0 bg-secondary/5 rounded-2xl blur-sm opacity-50 pointer-events-none" />
-        <Code className="w-6 h-6 text-secondary pointer-events-none" />
-        <span className="font-mono text-[9px] font-bold pointer-events-none">SERVER (API)</span>
-        <span className="text-[8px] text-muted-foreground pointer-events-none">Python FastAPI</span>
+        <div className="absolute inset-0.5 rounded-2xl border border-white/5 pointer-events-none" />
+        <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
+          <Code className="w-5 h-5" />
+        </div>
+        <div className="text-center">
+          <span className="font-mono text-[9px] font-bold block text-foreground">SERVER (API)</span>
+          <span className="text-[7px] text-muted-foreground font-mono">FastAPI + Python</span>
+        </div>
       </motion.div>
 
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] text-muted-foreground/60 bg-background/50 border border-border/30 rounded px-2 py-0.5 pointer-events-none">
-        {"GET /api/posts/featured -> 200 OK"}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 font-mono text-[8px] text-muted-foreground/60 bg-[#0d0720]/80 border border-border/20 rounded px-2.5 py-1 backdrop-blur-md pointer-events-none">
+        GET <span className="text-primary">/api/posts/featured</span> &rarr; <span className="text-emerald-400">200 OK</span>
       </div>
 
       <div className="absolute bottom-28 left-1/2 -translate-x-1/2 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
-        CLICK EITHER NODE TO EMIT DATA
+        CLICK CANVAS TO TRIGGER REQUESTS
       </div>
     </div>
   );
 }
 
-// Chapter 4 Visual: Security Shield
+// Chapter 4 Visual: Security Shield (Holographic Cyber Shield)
 function SecurityVisual() {
   const [shieldActive, setShieldActive] = useState(true);
 
   return (
     <div 
       onClick={() => setShieldActive(!shieldActive)}
-      className="w-full h-full bg-gradient-to-b from-background to-emerald-950/10 flex items-center justify-center relative overflow-hidden cursor-pointer"
+      className="w-full h-full bg-gradient-to-br from-[#040912] via-[#050e18] to-[#071923] flex items-center justify-center relative overflow-hidden cursor-pointer"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:18px_18px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
 
       <motion.div 
-        className="absolute inset-x-0 h-0.5 bg-emerald-500/30 shadow-lg shadow-emerald-500/50 pointer-events-none z-10"
+        className="absolute inset-x-0 h-0.5 bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.4)] pointer-events-none z-10"
         animate={{
           top: ["0%", "100%", "0%"]
         }}
         transition={{
-          duration: 4,
+          duration: 3.5,
           repeat: Infinity,
           ease: "easeInOut"
         }}
       />
 
-      <div className="relative flex items-center justify-center">
+      <div className="relative flex items-center justify-center scale-95 pointer-events-none">
         <motion.div 
-          className="absolute w-36 h-36 rounded-full border-2 border-dashed border-emerald-500/20 pointer-events-none"
+          className="absolute w-44 h-44 rounded-full border border-dashed border-emerald-500/10 pointer-events-none"
           animate={{ rotate: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
         />
 
         <motion.div 
-          className="absolute w-28 h-28 rounded-full border border-dashed border-emerald-400/30 pointer-events-none"
+          className="absolute w-36 h-36 rounded-full border border-dotted border-emerald-400/20 pointer-events-none"
           animate={{ rotate: -360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
+
+        <div className="absolute w-32 h-32 rounded-full border border-emerald-500/5 pointer-events-none" />
 
         <AnimatePresence>
           {shieldActive && (
             <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1.1, opacity: 0.25 }}
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1.15, opacity: 0.15 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className="absolute w-28 h-28 rounded-full bg-emerald-500/30 blur-md pointer-events-none"
-              transition={{ duration: 0.3 }}
+              className="absolute w-32 h-32 rounded-full bg-emerald-400/25 blur-md pointer-events-none shadow-[inset_0_0_20px_rgba(52,211,153,0.3)]"
+              transition={{ duration: 0.35 }}
             />
           )}
         </AnimatePresence>
 
         <motion.div 
-          className={`w-16 h-16 rounded-full flex flex-col items-center justify-center border-2 shadow-xl z-20 transition-colors duration-300 pointer-events-none ${
+          className={`w-20 h-20 rounded-full flex flex-col items-center justify-center border-2 shadow-2xl z-20 transition-all duration-300 pointer-events-none ${
             shieldActive 
-              ? "bg-card border-emerald-500/60 text-emerald-400 shadow-emerald-500/10" 
-              : "bg-card border-amber-500/40 text-amber-400 shadow-amber-500/10"
+              ? "bg-[#09151e]/90 border-emerald-500/60 text-emerald-400 shadow-emerald-500/20" 
+              : "bg-[#181111]/90 border-amber-500/40 text-amber-400 shadow-amber-500/10"
           }`}
           whileHover={{ scale: 1.05 }}
         >
           <motion.div
-            animate={shieldActive ? { scale: [1, 1.1, 1] } : {}}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            animate={shieldActive ? { scale: [1, 1.08, 1] } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
           >
             {shieldActive ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/></svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield-off"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
             )}
           </motion.div>
+          <span className={`text-[7px] font-mono mt-1 ${shieldActive ? "text-emerald-400/80" : "text-amber-400/80"}`}>
+            {shieldActive ? "GUARDED" : "OFF"}
+          </span>
         </motion.div>
       </div>
 
-      <div className="absolute top-4 left-4 font-mono text-[8px] bg-background/50 border border-border/40 p-1 rounded flex items-center gap-1 pointer-events-none">
+      <div className="absolute top-6 left-6 font-mono text-[8px] bg-[#040912]/80 border border-border/20 p-1.5 rounded backdrop-blur-md flex items-center gap-1.5 pointer-events-none">
         <span className={`w-1.5 h-1.5 rounded-full ${shieldActive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
-        <span>SCREEN_GUARD: {shieldActive ? "ACTIVE" : "DISABLED"}</span>
+        <span>SHIELD_CAPTURE: {shieldActive ? "ACTIVE" : "INACTIVE"}</span>
       </div>
 
-      <div className="absolute bottom-28 left-4 font-mono text-[8px] text-muted-foreground/50 pointer-events-none">
-        &gt;_ anti_screenshot.py
+      <div className="absolute bottom-28 left-6 font-mono text-[8px] text-emerald-500/40 pointer-events-none">
+        sec_guard.py [sys.log]
       </div>
       
-      <div className="absolute bottom-28 right-4 font-mono text-[8px] text-muted-foreground/50 pointer-events-none">
-        &gt;_ anti_record.ts
+      <div className="absolute bottom-28 right-6 font-mono text-[8px] text-emerald-500/40 pointer-events-none">
+        clearance_level: user.root
       </div>
 
-      <div className="absolute top-4 right-4 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
-        CLICK TO TOGGLE GUARD
+      <div className="absolute top-6 right-6 font-mono text-[8px] text-muted-foreground/40 pointer-events-none">
+        CLICK TO ENGAGE GUARD
       </div>
     </div>
   );
@@ -455,7 +516,7 @@ const CHAPTER_VISUALS = [
   },
   {
     title: "Chapter 3: Full-Stack Connect",
-    description: "Connecting React user interfaces to Python backends. Click either node to send custom packets.",
+    description: "Connecting React user interfaces to Python backends. Click to send custom packets.",
     component: FullStackVisual
   },
   {
@@ -469,6 +530,8 @@ export default function AboutPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+
+  const VisualComponent = CHAPTER_VISUALS[currentIndex].component;
 
   const minSwipeDistance = 50;
 
@@ -578,7 +641,7 @@ export default function AboutPage() {
                   transition={{ duration: 0.3 }}
                   className="w-full h-full"
                 >
-                  {CHAPTER_VISUALS[currentIndex].component()}
+                  <VisualComponent />
                 </motion.div>
               </AnimatePresence>
               
